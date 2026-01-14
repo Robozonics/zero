@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZERO | India's Gen Z Social</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --bg-color: #050505; /* Darker, deeper black */
+            --surface-color: #121212;
+            /* Gen Z Neon Gradient Theme */
+            --brand-gradient: linear-gradient(135deg, #ff5722, #f700ff); 
+            --accent-color: #ff5722;
+            --text-primary: #ffffff;
+            --text-secondary: #71767b;
+            --border-color: #2f3336;
+            --verify-blue: #1d9bf0;
+            --verify-gold: #e7b30f; /* For Elon */
+            --glass-highlight: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        button { cursor: pointer; border: none; outline: none; }
+
+        /* --- LAYOUT GRID --- */
+        .app-container {
+            display: grid;
+            grid-template-columns: 275px 600px 350px;
+            max-width: 1265px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        /* --- LEFT SIDEBAR (NAV) --- */
+        .sidebar-left {
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+            padding-left: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* --- NEW AESTHETIC GEN Z LOGO --- */
+        .zero-logo-stylized {
+            font-family: 'Poppins', sans-serif;
+            font-size: 4.5rem;
+            line-height: 1;
+            font-weight: 900;
+            /* Gradient Text */
+            background: var(--brand-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            letter-spacing: -5px;
+            /* Neon Glow effect */
+            filter: drop-shadow(0 0 10px rgba(247, 0, 255, 0.6));
+            transition: transform 0.3s ease;
+        }
+        
+        .logo-container:hover .zero-logo-stylized {
+             transform: scale(1.05) rotate(-5deg);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 1.3rem;
+            padding: 15px 20px;
+            border-radius: 50px; /* Rounder pills */
+            transition: 0.2s;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .nav-item:hover {
+            background-color: var(--glass-highlight);
+        }
+
+        .nav-item.active {
+            font-weight: 800;
+            /* Subtle gradient glow on active item icon */
+        }
+        .nav-item.active i {
+             background: var(--brand-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Unique Gradient Button */
+        .post-btn-sidebar {
+            background: var(--brand-gradient);
+            color: white;
+            font-weight: 800;
+            font-size: 1.2rem;
+            padding: 18px;
+            border-radius: 50px;
+            margin-top: 20px;
+            width: 100%;
+            transition: 0.3s;
+            box-shadow: 0 4px 20px rgba(247, 0, 255, 0.3);
+        }
+
+        .post-btn-sidebar:hover {
+            transform: scale(1.03) translateY(-2px);
+            box-shadow: 0 6px 25px rgba(247, 0, 255, 0.5);
+        }
+
+        .user-profile-pill {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .user-profile-pill:hover {
+            background-color: var(--glass-highlight);
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: #222;
+            object-fit: cover;
+            border: 2px solid var(--bg-color);
+        }
+        
+        .avatar.elon {
+             border: 2px solid var(--verify-gold);
+        }
+
+        /* --- MAIN FEED (CENTER) --- */
+        .main-feed {
+            border-right: 1px solid var(--border-color);
+            /* Subtle background pattern for uniqueness */
+            background-image: radial-gradient(circle at center, #111 0%, var(--bg-color) 100%);
+        }
+
+        .feed-header {
+            position: sticky;
+            top: 0;
+            /* Glassmorphism header */
+            background-color: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+        }
+
+        .feed-header h2 {
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+
+        /* Create Post Area */
+        .create-post-area {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 15px;
+        }
+
+        .input-group {
+            flex: 1;
+        }
+
+        .post-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            resize: none;
+            outline: none;
+            min-height: 60px;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        
+        .post-input::placeholder {
+            color: #555;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .action-icons i {
+            color: var(--accent-color);
+            margin-right: 20px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: 0.2s;
+        }
+        .action-icons i:hover { text-shadow: 0 0 10px var(--accent-color); }
+
+        .post-btn-sm {
+            background: var(--brand-gradient);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1rem;
+            opacity: 0.5;
+            pointer-events: none;
+            transition: 0.3s;
+            border: none;
+        }
+
+        .post-btn-sm.active {
+            opacity: 1;
+            pointer-events: all;
+            box-shadow: 0 2px 10px rgba(247, 0, 255, 0.3);
+        }
+
+        /* Feed Posts */
+        .post {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 15px;
+            transition: 0.2s;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .post:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+        }
+
+        .pinned-indicator {
+             color:var(--text-secondary); 
+             font-size:0.85rem; 
+             margin-left:60px; 
+             margin-bottom:8px; 
+             font-weight: 600;
+             display: flex; align-items: center; gap: 5px;
+        }
+        .pinned-indicator i { color: var(--accent-color); }
+
+        .post-header {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .username {
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+        
+        .verified-badge { color: var(--verify-blue); font-size: 1rem; }
+        .verified-badge.gold { color: var(--verify-gold); } /* Elon's badge color */
+
+        .handle, .time {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .post-text {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+        }
+
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            max-width: 450px;
+            color: var(--text-secondary);
+        }
+
+        .interaction-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+
+        .interaction-btn:hover.comment { color: #1d9bf0; }
+        .interaction-btn:hover.repost { color: #00ba7c; }
+        .interaction-btn:hover.like { color: #f91880; }
+        
+        /* --- RIGHT SIDEBAR (WIDGETS) --- */
+        .sidebar-right {
+            padding: 25px 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .search-box {
+            background-color: var(--surface-color);
+            padding: 15px 25px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            border: 2px solid transparent;
+            transition: 0.3s;
+        }
+
+        .search-box:focus-within {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(255, 87, 34, 0.2);
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .widget-card {
+            background-color: var(--surface-color);
+            border-radius: 25px; /* Rounder corners */
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+
+        .widget-header {
+            font-weight: 900;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+        }
+
+        .trending-item {
+            padding: 15px 0;
+            cursor: pointer;
+            border-bottom: 1px solid #1d1f22;
+        }
+        .trending-item:last-child { border-bottom: none; }
+        .trending-item:hover { background-color: rgba(255,255,255,0.03); }
+
+        .trend-meta { font-size: 0.85rem; color: var(--text-secondary); }
+        .trend-title { font-weight: 800; margin: 4px 0; font-size: 1.1rem;}
+        
+        /* Made for India Badge */
+        .made-for-india {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+            padding-top: 25px;
+            font-weight: 600;
+        }
+        
+        .made-for-india span.safron { color: #ff9933; }
+        .made-for-india span.white { color: #fff; }
+        .made-for-india span.green { color: #138808; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1090px) {
+            .app-container { grid-template-columns: 90px 1fr 0; }
+            .sidebar-right { display: none; }
+            .sidebar-left { align-items: center; padding: 20px 10px; }
+            .nav-item span, .post-btn-sidebar, .user-profile-pill div, .logo-container { display: none; }
+            /* Show a mini logo on tablet */
+            .sidebar-left::before {
+                content: '0'; font-family: 'Poppins', sans-serif; font-size: 3rem; font-weight: 900;
+                background: var(--brand-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+                margin-bottom: 20px;
+            }
+            .nav-item { justify-content: center; padding: 15px; }
+             .user-profile-pill { padding: 5px; }
+        }
+        @media (max-width: 650px) {
+            .app-container { grid-template-columns: 1fr; }
+            .sidebar-left { display: none; } /* In real app, this becomes bottom nav */
+            .main-feed { width: 100%; border-right: none; }
+            .feed-header, .create-post-area { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar-left">
+            <div class="logo-container">
+                <div class="zero-logo-stylized">0</div>
+            </div>
+
+            <nav>
+                <a href="#" class="nav-item active"><i class="fa-solid fa-house-chimney"></i> <span>Home</span></a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-hashtag"></i> <span>Explore</span></a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-bell"></i> <span>Notifications</span></a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-envelope"></i> <span>Messages</span></a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-bookmark"></i> <span>Bookmarks</span></a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-user-astronaut"></i> <span>Profile</span></a>
+            </nav>
+
+            <button class="post-btn-sidebar" id="sidebarPostBtn">ZERO IT</button>
+
+            <div class="user-profile-pill">
+                <img src="https://img.freepik.com/premium-vector/avatar-profile-icon_188544-4755.jpg" class="avatar" alt="Current User">
+                <div>
+                    <div style="font-weight: 800;">Aryan_GenZ</div>
+                    <div style="color: var(--text-secondary);">@aryan_zero</div>
+                </div>
+                <i class="fa-solid fa-ellipsis-vertical" style="margin-left: auto; color: var(--text-secondary);"></i>
+            </div>
+        </aside>
+
+        <main class="main-feed">
+            <header class="feed-header">
+                <h2>Home Feed</h2>
+            </header>
+
+            <div class="create-post-area">
+                 <img src="https://img.freepik.com/premium-vector/avatar-profile-icon_188544-4755.jpg" class="avatar" alt="Current User">
+                <div class="input-group">
+                    <textarea id="postInput" class="post-input" placeholder="What's the vibe today, Bharat? ✨"></textarea>
+                    <div class="post-actions">
+                        <div class="action-icons">
+                            <i class="fa-solid fa-image"></i>
+                            <i class="fa-solid fa-gift"></i>
+                            <i class="fa-solid fa-square-poll-vertical"></i>
+                            <i class="fa-solid fa-face-smile-beam"></i>
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <button id="tweetBtn" class="post-btn-sm">Post</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedStream">
+                </div>
+        </main>
+
+        <aside class="sidebar-right">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass" style="color: var(--text-secondary)"></i>
+                <input type="text" placeholder="Search ZERO universe">
+            </div>
+
+            <div class="widget-card">
+                <div class="widget-header">Trending Now</div>
+                
+                <div class="trending-item">
+                    <div class="trend-meta">Bharat · Trending</div>
+                    <div class="trend-title">#AtmanirbharInvention</div>
+                    <div class="trend-meta">154K Posts</div>
+                </div>
+
+                <div class="trending-item">
+                    <div class="trend-meta">Tech · Trending</div>
+                    <div class="trend-title">Elon Musk</div>
+                    <div class="trend-meta">2.1M Posts</div>
+                </div>
+
+                <div class="trending-item">
+                    <div class="trend-meta">Culture · Trending</div>
+                    <div class="trend-title">#GenZIndia</div>
+                    <div class="trend-meta">89K Posts</div>
+                </div>
+            </div>
+
+            <div class="widget-card">
+                <div class="widget-header">Who to follow</div>
+                <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center;">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1356/1356479.png" class="avatar" style="background:#fff; padding:5px;">
+                    <div style="flex:1;">
+                        <div style="font-weight:800;">ISRO Official <i class="fa-solid fa-circle-check verified-badge"></i></div>
+                        <div style="font-size:0.9rem; color:var(--text-secondary);">@isro_india</div>
+                    </div>
+                    <button style="background:var(--text-primary); color:var(--bg-color); padding:8px 20px; border-radius:25px; font-weight:800;">Follow</button>
+                </div>
+            </div>
+
+            <div class="made-for-india">
+                <p>Made with ⚡ & ❤️ for <span class="safron">In</span><span class="white">d</span><span class="green">ia</span></p>
+                <p style="margin-top:8px; font-size: 0.8rem; opacity: 0.7;">© 2024 ZERO Platforms.</p>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // --- 1. DATA ---
+        const posts = [
+            {
+                id: 1,
+                name: "REHAN RS",
+                handle: "@rehan_rs",
+                // Using a stylized male avatar 
+                avatar: "https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg",
+                content: "Welcome to ZERO! 🇮🇳 India's own social media revolution. Built for Gen Z, made for Atmanirbhar Bharat. Let's redefine connection. This is just the beginning. #JaiHind #ZeroLaunch #IndiaRising",
+                time: "Pinned",
+                verified: "blue",
+                likes: "204K",
+                reposts: "18.2K",
+                comments: "5.5K"
+            },
+            {
+                id: 2,
+                name: "Elon Musk",
+                handle: "@elonmusk",
+                // Elon Musk Avatar
+                avatar: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Elon_Musk_Colorado_2022_%28cropped2%29.jpg/440px-Elon_Musk_Colorado_2022_%28cropped2%29.jpg",
+                content: "Just tried ZERO. The latency is incredible and the UI is fire 🔥. India's engineering talent is truly world-class. Great to see competitive innovation emerging from Bharat. 🇮🇳🚀",
+                time: "42m",
+                verified: "gold", // Special gold badge for Elon
+                likes: "1.2M",
+                reposts: "340K",
+                comments: "52K"
+            },
+            {
+                id: 3,
+                name: "Tech Ninja",
+                handle: "@ninja_dev_in",
+                // Generic dev avatar
+                avatar: "https://cdn-icons-png.flaticon.com/512/4333/4333609.png",
+                content: "Okay, the dark mode on ZERO hits different. That neon glow on the logo is sick! Finally a platform that understands aesthetics. 👾🖥️",
+                time: "2h",
+                verified: false,
+                likes: "450",
+                reposts: "30",
+                comments: "12"
+            }
+        ];
+
+        // --- 2. DOM ELEMENTS ---
+        const feedStream = document.getElementById('feedStream');
+        const postInput = document.getElementById('postInput');
+        const tweetBtn = document.getElementById('tweetBtn');
+        const sidebarPostBtn = document.getElementById('sidebarPostBtn');
+
+        // --- 3. FUNCTIONS ---
+
+        function createPostHTML(post) {
+            let verifiedBadgeHtml = '';
+            if (post.verified === 'blue') {
+                verifiedBadgeHtml = '<i class="fa-solid fa-circle-check verified-badge"></i>';
+            } else if (post.verified === 'gold') {
+                 verifiedBadgeHtml = '<i class="fa-solid fa-circle-check verified-badge gold"></i>';
+            }
+
+            const pinIcon = post.time === "Pinned" ? `
+                <div class="pinned-indicator">
+                    <i class="fa-solid fa-thumbtack"></i> 
+                    <span>Pinned by ZERO</span>
+                </div>` : '';
+
+            // Add special class to avatar if it's Elon for the gold border
+            const avatarClass = post.handle === '@elonmusk' ? 'avatar elon' : 'avatar';
+
+            return `
+                <article>
+                    ${pinIcon}
+                    <div class="post">
+                        <img src="${post.avatar}" class="${avatarClass}" alt="${post.name}">
+                        <div class="post-content">
+                            <div class="post-header">
+                                <span class="username">${post.name}</span>
+                                ${verifiedBadgeHtml}
+                                <span class="handle">${post.handle}</span>
+                                <span class="time">· ${post.time}</span>
+                            </div>
+                            <div class="post-text">${post.content}</div>
+                            <div class="post-footer">
+                                <div class="interaction-btn comment"><i class="fa-regular fa-comment"></i> ${post.comments}</div>
+                                <div class="interaction-btn repost"><i class="fa-solid fa-retweet"></i> ${post.reposts}</div>
+                                <div class="interaction-btn like"><i class="fa-regular fa-heart"></i> ${post.likes}</div>
+                                <div class="interaction-btn share"><i class="fa-solid fa-share-nodes"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderFeed() {
+            feedStream.innerHTML = posts.map(post => createPostHTML(post)).join('');
+        }
+
+        // --- 4. EVENT LISTENERS ---
+
+        postInput.addEventListener('input', function() {
+            if (this.value.trim().length > 0) {
+                tweetBtn.classList.add('active');
+            } else {
+                tweetBtn.classList.remove('active');
+            }
+        });
+
+        tweetBtn.addEventListener('click', function() {
+            const content = postInput.value.trim();
+            if (!content) return;
+
+            const newPost = {
+                id: Date.now(),
+                name: "Aryan_GenZ",
+                handle: "@aryan_zero",
+                // Current user male avatar
+                avatar: "https://img.freepik.com/premium-vector/avatar-profile-icon_188544-4755.jpg",
+                content: content,
+                time: "Just now",
+                verified: false,
+                likes: "0",
+                reposts: "0",
+                comments: "0"
+            };
+
+            // Insert new post after the pinned post (index 1)
+            posts.splice(1, 0, newPost);
+            renderFeed();
+            postInput.value = '';
+            tweetBtn.classList.remove('active');
+        });
+
+        sidebarPostBtn.addEventListener('click', () => {
+            postInput.focus();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // --- 5. INITIALIZATION ---
+        renderFeed();
+
+    </script>
+</body>
+</html>

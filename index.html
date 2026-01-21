@@ -3,505 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZERO | The Pulse of Bharat</title>
+    <title>ZERO | Pulse of Bharat</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@900&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #000000;
-            --surface: #0a0a0a;
-            --surface-hover: #16181c;
-            --border: #2f3336;
-            --text-main: #eff3f4;
-            --text-dim: #71767b;
-            --accent: #ff5722;
-            --pink: #f700ff;
-            --verify: #1d9bf0;
-            --error: #f4212e;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg); color: var(--text-main); overflow-x: hidden; }
+        :root { --bg: #000; --border: #2f3336; --accent: #ff5722; --text: #eff3f4; --dim: #71767b; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); }
         .hidden { display: none !important; }
 
-        /* --- AUTHENTICATION LAYER --- */
-        #auth-gate {
-            position: fixed; inset: 0; background: #000; z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .auth-container {
-            width: 100%; max-width: 400px; padding: 40px;
-            background: var(--surface); border: 1px solid var(--border); border-radius: 32px;
-            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-        .auth-logo {
-            font-family: 'Poppins'; font-size: 5rem; letter-spacing: -8px;
-            background: linear-gradient(to bottom, var(--accent), var(--pink));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
-        }
-        .auth-input {
-            width: 100%; padding: 16px; margin: 12px 0;
-            background: #000; border: 1px solid var(--border); color: #white;
-            border-radius: 12px; font-size: 1rem; transition: 0.3s;
-        }
-        .auth-input:focus { border-color: var(--accent); outline: none; }
-        .auth-btn {
-            width: 100%; padding: 16px; margin-top: 20px; border-radius: 50px;
-            border: none; background: white; color: black; font-weight: 800;
-            font-size: 1rem; cursor: pointer; transition: 0.3s;
-        }
-        .auth-btn:hover { background: #e6e6e6; }
-        .auth-toggle { margin-top: 20px; color: var(--text-dim); cursor: pointer; font-size: 0.9rem; }
-        .auth-toggle span { color: var(--accent); font-weight: 600; }
-
-        /* --- APP MAIN LAYOUT --- */
-        .app-shell {
-            display: grid; grid-template-columns: 275px 600px 1fr;
-            max-width: 1250px; margin: 0 auto; min-height: 100vh;
-        }
-
-        /* Sidebar Navigation */
-        nav {
-            padding: 10px 20px; border-right: 1px solid var(--border);
-            position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column;
-        }
-        .nav-logo {
-            font-family: 'Poppins'; font-size: 3.5rem; letter-spacing: -6px;
-            background: linear-gradient(to bottom, var(--accent), var(--pink));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin: 10px 0 30px 10px; cursor: pointer;
-        }
-        .nav-item {
-            padding: 12px 15px; border-radius: 50px; font-size: 1.25rem;
-            display: flex; align-items: center; gap: 20px; cursor: pointer;
-            transition: 0.2s; margin-bottom: 5px; width: fit-content;
-        }
-        .nav-item:hover { background: var(--surface-hover); }
-        .nav-item.active { font-weight: 800; }
-        .nav-item i { font-size: 1.5rem; width: 30px; }
+        /* Layout */
+        .container { display: grid; grid-template-columns: 275px 600px 1fr; max-width: 1250px; margin: 0 auto; min-height: 100vh; }
         
-        .btn-post-main {
-            background: linear-gradient(135deg, var(--accent), var(--pink));
-            color: white; border: none; padding: 15px; border-radius: 50px;
-            font-weight: 800; font-size: 1.1rem; margin-top: 20px; cursor: pointer;
-            width: 90%; text-align: center; box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
-        }
+        /* Sidebar */
+        nav { padding: 10px 20px; border-right: 1px solid var(--border); position: sticky; top:0; height: 100vh; display: flex; flex-direction: column; }
+        .logo { font-size: 3rem; font-weight: 900; background: linear-gradient(to bottom, #ff5722, #f700ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; }
+        .nav-link { padding: 12px; font-size: 1.2rem; display: flex; align-items: center; gap: 15px; cursor: pointer; border-radius: 50px; margin-bottom: 5px; }
+        .nav-link:hover { background: #16181c; }
+        .btn-main-post { background: var(--accent); color: white; border: none; padding: 15px; border-radius: 50px; font-weight: 900; margin-top: 20px; cursor: pointer; }
 
-        .user-profile-mini {
-            margin-top: auto; padding: 12px; border-radius: 50px;
-            display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s;
-        }
-        .user-profile-mini:hover { background: var(--surface-hover); }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #222; object-fit: cover; }
-        .profile-info { line-height: 1.2; flex: 1; }
-        .profile-name { font-weight: 700; font-size: 0.95rem; }
-        .profile-handle { color: var(--text-dim); font-size: 0.9rem; }
+        /* Feed */
+        main { border-right: 1px solid var(--border); }
+        .header { padding: 15px; font-size: 1.25rem; font-weight: 800; border-bottom: 1px solid var(--border); sticky; top:0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
+        .composer { padding: 15px; border-bottom: 1px solid var(--border); display: flex; gap: 15px; }
+        .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; background: #222; }
+        textarea { width: 100%; background: transparent; border: none; color: white; font-size: 1.2rem; outline: none; resize: none; margin-top: 10px; }
+        .post-btn-sm { background: var(--accent); color: white; border: none; padding: 8px 20px; border-radius: 50px; font-weight: 700; cursor: pointer; float: right; }
 
-        /* Main Content Area */
-        main { border-right: 1px solid var(--border); position: relative; }
-        .main-header {
-            position: sticky; top: 0; background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(15px); border-bottom: 1px solid var(--border);
-            padding: 15px 20px; z-index: 100;
-        }
-        .main-header h2 { font-size: 1.25rem; font-weight: 800; }
-
-        /* Composer */
-        .composer {
-            padding: 20px; border-bottom: 1px solid var(--border);
-            display: flex; gap: 15px;
-        }
-        .composer-avatar { width: 48px; height: 48px; border-radius: 50%; }
-        .composer-body { flex: 1; }
-        .composer-input {
-            width: 100%; background: transparent; border: none;
-            color: white; font-size: 1.3rem; outline: none; resize: none;
-            padding-top: 10px; min-height: 50px;
-        }
-        .composer-actions {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-top: 15px; border-top: 1px solid #16181c; padding-top: 15px;
-        }
-        .composer-tools { display: flex; gap: 15px; color: var(--accent); font-size: 1.1rem; }
-        .composer-tools i { cursor: pointer; padding: 8px; border-radius: 50%; transition: 0.2s; }
-        .composer-tools i:hover { background: rgba(255,87,34,0.1); }
-        .btn-pulse-sm {
-            background: var(--accent); color: white; border: none;
-            padding: 8px 20px; border-radius: 50px; font-weight: 700;
-            font-size: 0.95rem; cursor: pointer;
-        }
-        .btn-pulse-sm:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* Feed Posts */
-        .pulse-card {
-            padding: 15px 20px; border-bottom: 1px solid var(--border);
-            display: flex; gap: 12px; transition: 0.2s; cursor: pointer;
-        }
-        .pulse-card:hover { background: rgba(255,255,255,0.02); }
-        .pulse-body { flex: 1; }
-        .pulse-header { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; }
-        .pulse-user { font-weight: 700; font-size: 0.95rem; }
-        .pulse-user:hover { text-decoration: underline; }
-        .pulse-handle { color: var(--text-dim); font-size: 0.9rem; }
-        .pulse-time { color: var(--text-dim); font-size: 0.9rem; }
-        .pulse-content { font-size: 1rem; line-height: 1.5; margin-bottom: 12px; word-wrap: break-word; }
-        
-        .pulse-actions {
-            display: flex; justify-content: space-between; max-width: 425px;
-            color: var(--text-dim); font-size: 0.85rem;
-        }
-        .action-item { display: flex; align-items: center; gap: 8px; transition: 0.2s; }
-        .action-item:hover.blue { color: var(--verify); }
-        .action-item:hover.green { color: #00ba7c; }
-        .action-item:hover.pink { color: #f91880; }
-        .action-item i { padding: 8px; border-radius: 50%; }
-        .action-item:hover.blue i { background: rgba(29,155,240,0.1); }
+        /* Posts */
+        .post { padding: 15px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; transition: 0.2s; cursor: pointer; }
+        .post:hover { background: rgba(255,255,255,0.03); }
+        .post-user { font-weight: 700; display: flex; align-items: center; gap: 4px; }
+        .verify { color: #1d9bf0; font-size: 0.9rem; }
+        .post-handle { color: var(--dim); font-weight: 400; font-size: 0.9rem; }
+        .post-content { margin-top: 5px; line-height: 1.5; }
+        .post-actions { display: flex; justify-content: space-between; max-width: 400px; margin-top: 12px; color: var(--dim); }
+        .post-actions i:hover { color: var(--accent); }
         .liked { color: #f91880 !important; }
 
+        /* Auth */
+        #auth-overlay { position: fixed; inset: 0; background: black; z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .auth-card { width: 400px; padding: 40px; border: 1px solid var(--border); border-radius: 20px; text-align: center; }
+        input { width: 100%; padding: 15px; margin: 10px 0; background: #111; border: 1px solid var(--border); color: white; border-radius: 8px; }
+
         /* Right Sidebar */
-        .sidebar-right { padding: 10px 20px; }
-        .search-box {
-            background: #202327; padding: 12px 20px; border-radius: 50px;
-            display: flex; align-items: center; gap: 15px; margin-bottom: 20px;
-            position: sticky; top: 10px; z-index: 10;
-        }
-        .search-box input { background: transparent; border: none; color: white; width: 100%; outline: none; }
-        
-        .trending-panel {
-            background: var(--surface); border-radius: 20px; overflow: hidden; margin-bottom: 20px;
-        }
-        .panel-title { padding: 15px 20px; font-size: 1.25rem; font-weight: 800; }
-        .trending-item { padding: 12px 20px; transition: 0.2s; cursor: pointer; }
-        .trending-item:hover { background: var(--surface-hover); }
-        .trend-category { color: var(--text-dim); font-size: 0.8rem; }
-        .trend-name { font-weight: 700; margin: 2px 0; }
-        .trend-count { color: var(--text-dim); font-size: 0.8rem; }
-
-        .who-to-follow {
-            background: var(--surface); border-radius: 20px; padding-bottom: 10px;
-        }
-        .follow-card {
-            padding: 12px 20px; display: flex; align-items: center; gap: 12px;
-            transition: 0.2s; cursor: pointer;
-        }
-        .follow-card:hover { background: var(--surface-hover); }
-        .btn-follow {
-            background: white; color: black; border: none; padding: 8px 16px;
-            border-radius: 50px; font-weight: 700; font-size: 0.85rem; margin-left: auto;
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 1100px) {
-            .app-shell { grid-template-columns: 80px 1fr; }
-            .nav-text, .btn-post-main, .sidebar-right, .profile-info { display: none; }
-            nav { align-items: center; }
-            .nav-logo { font-size: 2.5rem; margin-left: 0; }
-        }
+        .right-bar { padding: 20px; }
+        .widget { background: #16181c; border-radius: 15px; padding: 15px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="auth-gate">
-        <div class="auth-container">
-            <div class="auth-logo">0</div>
-            <h1 id="gate-title" style="margin-bottom: 10px; font-weight: 800;">Join Zero Today</h1>
-            <p style="color: var(--text-dim); margin-bottom: 30px;">See what's happening in Bharat right now.</p>
-            
-            <div id="signup-form" class="hidden">
-                <input type="text" id="auth-name" class="auth-input" placeholder="Display Name (e.g. REHAN RS)">
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <div class="logo">0</div>
+            <h2 id="auth-msg">Sign in to Zero</h2>
+            <div id="signup-extra" class="hidden">
+                <input type="text" id="user-name" placeholder="Full Name (REHAN RS / ZERO)">
             </div>
-            <input type="email" id="auth-email" class="auth-input" placeholder="Email Address">
-            <input type="password" id="auth-pass" class="auth-input" placeholder="Password (6+ Characters)">
-            
-            <button class="auth-btn" id="main-auth-btn" onclick="handleAuthentication()">Log In</button>
-            
-            <p class="auth-toggle" onclick="toggleAuthMode()">
-                Don't have an account? <span id="toggle-text">Sign Up</span>
-            </p>
-            <p id="error-log" style="color: var(--error); margin-top: 15px; font-size: 0.85rem; font-weight: 600;"></p>
+            <input type="email" id="user-email" placeholder="Email">
+            <input type="password" id="user-pass" placeholder="Password (Min 6 chars)">
+            <button class="btn-main-post" style="width:100%" onclick="handleAuth()">Continue</button>
+            <p style="color:var(--dim); margin-top:20px; cursor:pointer" onclick="toggleAuth()">New? <span style="color:white">Create Account</span></p>
+            <p id="error-msg" style="color:red; margin-top:10px"></p>
         </div>
     </div>
 
-    <div id="app-root" class="app-shell hidden">
+    <div id="app" class="container hidden">
         <nav>
-            <div class="nav-logo">0</div>
-            <div class="nav-item active"><i class="fa-solid fa-house"></i> <span class="nav-text">Home</span></div>
-            <div class="nav-item"><i class="fa-solid fa-hashtag"></i> <span class="nav-text">Explore</span></div>
-            <div class="nav-item"><i class="fa-solid fa-bell"></i> <span class="nav-text">Notifications</span></div>
-            <div class="nav-item"><i class="fa-solid fa-envelope"></i> <span class="nav-text">Messages</span></div>
-            <div class="nav-item"><i class="fa-solid fa-user"></i> <span class="nav-text">Profile</span></div>
-            <div class="nav-item" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> <span class="nav-text">Logout</span></div>
-            
-            <button class="btn-post-main">Pulse</button>
-
-            <div class="user-profile-mini" id="nav-profile-card">
-                <img src="" class="avatar" id="nav-avatar">
-                <div class="profile-info">
-                    <div class="profile-name" id="nav-name">User</div>
-                    <div class="profile-handle" id="nav-handle">@user</div>
-                </div>
-                <i class="fa-solid fa-ellipsis" style="color: var(--text-dim)"></i>
-            </div>
+            <div class="logo">0</div>
+            <div class="nav-link"><i class="fa-solid fa-house"></i> Home</div>
+            <div class="nav-link"><i class="fa-solid fa-bell"></i> Notifications</div>
+            <div class="nav-link"><i class="fa-solid fa-user"></i> Profile</div>
+            <button class="btn-main-post" onclick="logout()">Logout</button>
         </nav>
 
         <main>
-            <div class="main-header">
-                <h2>Home</h2>
-            </div>
-
+            <div class="header">Home</div>
             <div class="composer">
-                <img src="" class="avatar composer-avatar" id="comp-avatar">
-                <div class="composer-body">
-                    <textarea class="composer-input" id="pulse-input" placeholder="What's happening, Bharat?"></textarea>
-                    <div class="composer-actions">
-                        <div class="composer-tools">
-                            <i class="fa-regular fa-image"></i>
-                            <i class="fa-solid fa-list-ul"></i>
-                            <i class="fa-regular fa-face-smile"></i>
-                            <i class="fa-regular fa-calendar-check"></i>
-                            <i class="fa-solid fa-location-dot"></i>
-                        </div>
-                        <button class="btn-pulse-sm" id="btn-publish" onclick="createNewPulse()" disabled>Pulse</button>
-                    </div>
+                <img id="my-avatar" class="avatar">
+                <div style="flex:1">
+                    <textarea id="post-text" placeholder="What's the pulse, Bharat?"></textarea>
+                    <button class="post-btn-sm" onclick="sendPost()">Pulse</button>
                 </div>
             </div>
-
-            <div id="pulse-feed">
-                </div>
+            <div id="feed"></div>
         </main>
 
-        <div class="sidebar-right">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass" style="color: var(--text-dim)"></i>
-                <input type="text" placeholder="Search Zero">
-            </div>
-
-            <div class="trending-panel">
-                <div class="panel-title">What's happening</div>
-                <div class="trending-item">
-                    <div class="trend-category">Politics · Trending</div>
-                    <div class="trend-name">#DigitalIndia</div>
-                    <div class="trend-count">42.5K Pulses</div>
-                </div>
-                <div class="trending-item">
-                    <div class="trend-category">Sports · Trending</div>
-                    <div class="trend-name">Virat Kohli</div>
-                    <div class="trend-count">128K Pulses</div>
-                </div>
-                <div class="trending-item">
-                    <div class="trend-category">Tech · Trending</div>
-                    <div class="trend-name">@ZERO_App</div>
-                    <div class="trend-count">1.2M Pulses</div>
-                </div>
-                <div style="padding: 15px 20px; color: var(--accent); cursor: pointer; font-size: 0.9rem;">Show more</div>
-            </div>
-
-            <div class="who-to-follow">
-                <div class="panel-title">Who to follow</div>
-                <div id="follow-suggestions">
-                    </div>
-                <div style="padding: 15px 20px; color: var(--accent); cursor: pointer; font-size: 0.9rem;">Show more</div>
+        <div class="right-bar">
+            <div class="widget">
+                <h3>What's happening</h3>
+                <p style="margin-top:10px; color:var(--dim)">#ZeroLaunch</p>
+                <p style="color:var(--dim)">#RehanRS</p>
             </div>
         </div>
     </div>
 
     <script>
-        // Supabase Credentials
         const SB_URL = 'https://tsuiaealzqkkwmlwrdyn.supabase.co';
         const SB_KEY = 'sb_publishable_5WCnkOmfRZ4W3sTNDwtlpQ_pmIZi90g';
         const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
 
-        let userSessionProfile = null;
-        let isSignUpMode = false;
+        let myProfile = null;
+        let signup = false;
 
-        // --- AUTH LOGIC ---
-        function toggleAuthMode() {
-            isSignUpMode = !isSignUpMode;
-            document.getElementById('signup-form').classList.toggle('hidden');
-            document.getElementById('gate-title').innerText = isSignUpMode ? "Create Your Account" : "Join Zero Today";
-            document.getElementById('toggle-text').innerText = isSignUpMode ? "Log In" : "Sign Up";
-            document.getElementById('main-auth-btn').innerText = isSignUpMode ? "Create Account" : "Log In";
+        function toggleAuth() {
+            signup = !signup;
+            document.getElementById('signup-extra').classList.toggle('hidden');
+            document.getElementById('auth-msg').innerText = signup ? "Create Account" : "Sign in to Zero";
         }
 
-        async function handleAuthentication() {
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-pass').value;
-            const errorLog = document.getElementById('error-log');
-            errorLog.innerText = "";
+        async function handleAuth() {
+            const email = document.getElementById('user-email').value;
+            const pass = document.getElementById('user-pass').value;
+            const name = document.getElementById('user-name').value;
+            const err = document.getElementById('error-msg');
 
-            if (isSignUpMode) {
-                const name = document.getElementById('auth-name').value;
-                if(!name || password.length < 6) {
-                    errorLog.innerText = "Error: Name required & Password must be 6+ characters.";
-                    return;
-                }
+            if (signup) {
+                if (pass.length < 6) return err.innerText = "Password too short!";
+                const { data, error } = await supabaseClient.auth.signUp({ email, password: pass });
+                if (error) return err.innerText = error.message;
 
-                const { data, error } = await supabaseClient.auth.signUp({ email, password });
-                if (error) return errorLog.innerText = error.message;
-
-                // Build detailed profile
-                let handle = "@" + name.toLowerCase().replace(/\s/g, '_') + Math.floor(Math.random() * 99);
-                let verified = false;
+                // Create profile with Auto-Verify logic
+                let handle = "@" + name.toLowerCase().replace(/\s/g, '');
+                let isVerified = (name.toUpperCase() === "REHAN RS" || name.toUpperCase() === "ZERO");
                 
-                // Logic for your special accounts
-                if(name.toUpperCase() === "REHAN RS") { verified = true; handle = "@rehan_rs"; }
-                if(name.toUpperCase() === "ZERO") { verified = true; handle = "@zero_official"; }
-
-                const { error: pError } = await supabaseClient.from('profiles').insert([{
-                    id: data.user.id,
-                    username: name,
-                    handle: handle,
-                    is_verified: verified,
-                    avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`,
-                    bio: "New Pulse User 🇮🇳"
+                await supabaseClient.from('profiles').insert([{
+                    id: data.user.id, username: name, handle: handle,
+                    is_verified: isVerified, avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`
                 }]);
-
-                if(pError) errorLog.innerText = "Profile Setup Error: " + pError.message;
-                else alert("Account Created Successfully! Please Log In.");
-                location.reload();
-
+                alert("Account created! Login now."); location.reload();
             } else {
-                const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-                if (error) errorLog.innerText = error.message;
-                else startAppSession();
+                const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+                if (error) return err.innerText = error.message;
+                init();
             }
         }
 
-        // --- CORE APP LOGIC ---
-        async function startAppSession() {
+        async function init() {
             const { data: { user } } = await supabaseClient.auth.getUser();
             if (!user) return;
 
-            // Fetch User Details
             const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
-            
-            if (!profile) {
-                // Rescue mission if profile failed to create
-                await supabaseClient.from('profiles').insert([{ 
-                    id: user.id, username: "Zero User", handle: "@user_"+user.id.slice(0,4),
-                    avatar_url: "https://api.dicebear.com/7.x/bottts/svg?seed=zero"
-                }]);
-                return startAppSession();
-            }
+            if (!profile) return logout();
 
-            userSessionProfile = profile;
-            
-            // UI Transition
-            document.getElementById('auth-gate').classList.add('hidden');
-            document.getElementById('app-root').classList.remove('hidden');
-
-            // Set UI User Data
-            document.getElementById('nav-avatar').src = profile.avatar_url;
-            document.getElementById('comp-avatar').src = profile.avatar_url;
-            document.getElementById('nav-name').innerText = profile.username;
-            document.getElementById('nav-handle').innerText = profile.handle;
-
-            refreshFeed();
-            loadSuggestions();
+            myProfile = profile;
+            document.getElementById('auth-overlay').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            document.getElementById('my-avatar').src = profile.avatar_url;
+            loadPosts();
         }
 
-        // --- FEED LOGIC ---
-        async function refreshFeed() {
-            const { data: pulses, error } = await supabaseClient
-                .from('posts')
-                .select(`id, content, created_at, profiles(username, handle, avatar_url, is_verified)`)
-                .order('created_at', { ascending: false });
+        async function loadPosts() {
+            const { data: posts } = await supabaseClient.from('posts').select(`id, content, profiles(username, handle, avatar_url, is_verified)`).order('created_at', { ascending: false });
+            const { data: myLikes } = await supabaseClient.from('likes').select('post_id').eq('user_id', myProfile.id);
+            const likedSet = new Set(myLikes.map(l => l.post_id));
 
-            const container = document.getElementById('pulse-feed');
-            if (pulses) {
-                container.innerHTML = pulses.map(p => renderPulseCard(p)).join('');
-            }
-        }
-
-        function renderPulseCard(p) {
-            const date = new Date(p.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
-            return `
-                <div class="pulse-card">
-                    <img src="${p.profiles?.avatar_url}" class="avatar">
-                    <div class="pulse-body">
-                        <div class="pulse-header">
-                            <span class="pulse-user">${p.profiles?.username}</span>
-                            ${p.profiles?.is_verified ? '<i class="fa-solid fa-circle-check" style="color:var(--verify); font-size:0.85rem"></i>' : ''}
-                            <span class="pulse-handle">${p.profiles?.handle}</span>
-                            <span style="color:var(--text-dim)">·</span>
-                            <span class="pulse-time">${date}</span>
-                        </div>
-                        <div class="pulse-content">${p.content}</div>
-                        <div class="pulse-actions">
-                            <div class="action-item blue"><i class="fa-regular fa-comment"></i> <span>0</span></div>
-                            <div class="action-item green"><i class="fa-solid fa-retweet"></i> <span>0</span></div>
-                            <div class="action-item pink" onclick="handleLike(this)"><i class="fa-regular fa-heart"></i> <span>0</span></div>
-                            <div class="action-item blue"><i class="fa-solid fa-chart-simple"></i> <span>${Math.floor(Math.random()*1000)}</span></div>
+            document.getElementById('feed').innerHTML = posts.map(p => `
+                <div class="post">
+                    <img src="${p.profiles.avatar_url}" class="avatar">
+                    <div style="flex:1">
+                        <div class="post-user">${p.profiles.username} ${p.profiles.is_verified ? '<i class="fa-solid fa-circle-check verify"></i>' : ''} <span class="post-handle">${p.profiles.handle}</span></div>
+                        <div class="post-content">${p.content}</div>
+                        <div class="post-actions">
+                            <i class="fa-regular fa-comment"></i>
+                            <i class="fa-solid fa-retweet"></i>
+                            <i class="${likedSet.has(p.id) ? 'fa-solid liked' : 'fa-regular'} fa-heart" onclick="toggleLike(${p.id}, this)"></i>
+                            <i class="fa-solid fa-share-nodes"></i>
                         </div>
                     </div>
                 </div>
-            `;
+            `).join('');
         }
 
-        // --- COMPOSER LOGIC ---
-        const pulseInput = document.getElementById('pulse-input');
-        const publishBtn = document.getElementById('btn-publish');
+        async function sendPost() {
+            const text = document.getElementById('post-text').value;
+            if(!text) return;
+            await supabaseClient.from('posts').insert([{ user_id: myProfile.id, content: text }]);
+            document.getElementById('post-text').value = '';
+            loadPosts();
+        }
 
-        pulseInput.oninput = () => {
-            publishBtn.disabled = (pulseInput.value.trim().length === 0);
-        };
-
-        async function createNewPulse() {
-            const content = pulseInput.value;
-            publishBtn.innerText = "...";
-            publishBtn.disabled = true;
-
-            const { error } = await supabaseClient.from('posts').insert([{
-                user_id: userSessionProfile.id,
-                content: content
-            }]);
-
-            if (error) alert("Post Failed: " + error.message);
-            else {
-                pulseInput.value = "";
-                publishBtn.innerText = "Pulse";
-                refreshFeed();
+        async function toggleLike(postId, el) {
+            if (el.classList.contains('liked')) {
+                await supabaseClient.from('likes').delete().eq('post_id', postId).eq('user_id', myProfile.id);
+                el.classList.replace('fa-solid', 'fa-regular'); el.classList.remove('liked');
+            } else {
+                await supabaseClient.from('likes').insert([{ post_id: postId, user_id: myProfile.id }]);
+                el.classList.replace('fa-regular', 'fa-solid'); el.classList.add('liked');
             }
         }
 
-        // --- SIDEBAR LOGIC ---
-        async function loadSuggestions() {
-            const { data: users } = await supabaseClient.from('profiles').select('*').neq('id', userSessionProfile.id).limit(3);
-            const box = document.getElementById('follow-suggestions');
-            if(users) {
-                box.innerHTML = users.map(u => `
-                    <div class="follow-card">
-                        <img src="${u.avatar_url}" class="avatar">
-                        <div class="profile-info">
-                            <div class="profile-name">${u.username} ${u.is_verified ? '✔️' : ''}</div>
-                            <div class="profile-handle">${u.handle}</div>
-                        </div>
-                        <button class="btn-follow" onclick="this.innerText='Following'">Follow</button>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function handleLike(el) {
-            const icon = el.querySelector('i');
-            const span = el.querySelector('span');
-            icon.classList.toggle('fa-regular');
-            icon.classList.toggle('fa-solid');
-            el.classList.toggle('liked');
-            let count = parseInt(span.innerText);
-            span.innerText = el.classList.contains('liked') ? count + 1 : count - 1;
-        }
-
-        async function handleLogout() {
-            await supabaseClient.auth.signOut();
-            location.reload();
-        }
-
-        // --- AUTO BOOT ---
-        startAppSession();
+        async function logout() { await supabaseClient.auth.signOut(); location.reload(); }
+        init();
     </script>
 </body>
 </html>

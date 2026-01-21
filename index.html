@@ -3,58 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZERO | Bharat's GenZ Social</title>
+    <title>ZERO | Bharat's Pulse</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Poppins:wght@900&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #000; --surface: #0a0a0a; --accent: #ff5722; --pink: #f700ff; --border: #262626; --gray: #71767b; --verify: #1d9bf0; }
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+        :root { --bg: #000; --accent: #ff5722; --pink: #f700ff; --border: #262626; --gray: #71767b; --verify: #1d9bf0; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: var(--bg); color: white; overflow-x: hidden; }
         .hidden { display: none !important; }
 
-        /* Layout Grid */
+        /* Layout */
         .app-grid { display: grid; grid-template-columns: 275px 1fr 350px; max-width: 1250px; margin: 0 auto; min-height: 100vh; }
+        aside { padding: 20px; border-right: 1px solid var(--border); position: sticky; top: 0; height: 100vh; }
+        .logo { font-size: 3.5rem; font-weight: 900; background: linear-gradient(to bottom, var(--accent), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; letter-spacing: -4px; }
         
-        /* Sidebar */
-        aside { padding: 20px; border-right: 1px solid var(--border); position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
-        .logo { font-family: 'Poppins'; font-size: 4rem; background: linear-gradient(to bottom, var(--accent), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -6px; margin-bottom: 20px; cursor: pointer; }
-        .nav-link { padding: 12px 20px; font-size: 1.2rem; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 15px; font-weight: 600; transition: 0.2s; margin-bottom: 8px; }
-        .nav-link:hover { background: #161616; }
-        .nav-link.active { color: var(--accent); }
-
-        /* Feed */
+        /* Main Feed */
         main { border-right: 1px solid var(--border); }
-        .header { padding: 15px 20px; font-weight: 800; font-size: 1.3rem; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 100; }
+        .header { padding: 15px 20px; font-weight: 800; font-size: 1.2rem; border-bottom: 1px solid var(--border); sticky; top: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
         .composer { padding: 20px; border-bottom: 1px solid var(--border); display: flex; gap: 15px; }
-        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #222; object-fit: cover; }
-        textarea { width: 100%; background: transparent; border: none; color: white; font-size: 1.25rem; outline: none; resize: none; margin-top: 10px; min-height: 60px; }
+        .avatar { width: 48px; height: 48px; border-radius: 50%; background: #222; object-fit: cover; }
+        textarea { width: 100%; background: transparent; border: none; color: white; font-size: 1.2rem; outline: none; resize: none; margin-top: 10px; }
         .btn-pulse { background: linear-gradient(135deg, var(--accent), var(--pink)); color: white; border: none; padding: 10px 25px; border-radius: 30px; font-weight: 800; cursor: pointer; float: right; }
-        .btn-pulse:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* Post UI */
+        /* Post Cards */
         .post { padding: 20px; border-bottom: 1px solid var(--border); display: flex; gap: 15px; transition: 0.2s; }
         .post:hover { background: #080808; }
-        .user-meta { font-weight: 800; display: flex; align-items: center; gap: 5px; }
+        .username { font-weight: 800; display: flex; align-items: center; gap: 4px; }
         .handle { color: var(--gray); font-weight: 400; font-size: 0.9rem; }
-        .content { margin-top: 5px; font-size: 1.1rem; line-height: 1.5; color: #eff3f4; }
-        .actions { display: flex; gap: 60px; margin-top: 15px; color: var(--gray); font-size: 0.95rem; }
-        .actions i { cursor: pointer; transition: 0.2s; }
-        .actions i:hover { color: var(--accent); }
+        .actions { display: flex; gap: 50px; margin-top: 12px; color: var(--gray); }
         .liked { color: #f91880 !important; }
 
-        /* Auth UI */
+        /* Auth Screen */
         #auth-overlay { position: fixed; inset: 0; background: black; z-index: 1000; display: flex; justify-content: center; align-items: center; }
-        .auth-card { width: 400px; padding: 40px; border: 1px solid var(--border); border-radius: 30px; text-align: center; background: #000; }
-        input { width: 100%; padding: 16px; margin: 10px 0; background: #111; border: 1px solid var(--border); color: white; border-radius: 12px; font-size: 1rem; outline: none; }
-        input:focus { border-color: var(--accent); }
-
-        /* Suggestions */
-        .widget { background: var(--surface); border-radius: 20px; padding: 20px; margin: 20px; }
-        .suggested-user { display: flex; align-items: center; gap: 12px; margin-top: 15px; }
-        .btn-follow { background: white; color: black; border: none; padding: 6px 16px; border-radius: 20px; font-weight: 800; cursor: pointer; font-size: 0.85rem; margin-left: auto; }
-
-        @media (max-width: 1000px) { .app-grid { grid-template-columns: 80px 1fr 0; } .nav-text, .widget { display: none; } }
+        .auth-card { width: 380px; padding: 40px; border: 1px solid var(--border); border-radius: 24px; text-align: center; }
+        input { width: 100%; padding: 14px; margin: 8px 0; background: #111; border: 1px solid var(--border); color: white; border-radius: 10px; font-size: 1rem; }
+        
+        @media (max-width: 1000px) { .app-grid { grid-template-columns: 80px 1fr 0; } .nav-text, .right-sidebar { display: none; } }
     </style>
 </head>
 <body>
@@ -62,46 +46,43 @@
     <div id="auth-overlay">
         <div class="auth-card">
             <div class="logo">0</div>
-            <h2 id="auth-title" style="margin-bottom: 20px;">Welcome to Zero</h2>
-            <div id="signup-fields" class="hidden">
-                <input type="text" id="name-input" placeholder="Name (e.g. REHAN RS)">
+            <h2 id="auth-title">Sign in to Zero</h2>
+            <div id="signup-only" class="hidden">
+                <input type="text" id="reg-name" placeholder="Full Name (REHAN RS / ZERO)">
             </div>
-            <input type="email" id="email-input" placeholder="Email address">
-            <input type="password" id="pass-input" placeholder="Password (min 6 chars)">
-            <button class="btn-pulse" style="width:100%; margin-top: 10px; float: none;" onclick="handleAuth()">Continue</button>
-            <p style="margin-top:25px; color:var(--gray); cursor:pointer" onclick="toggleAuth()">New here? <span style="color:white">Create Account</span></p>
+            <input type="email" id="auth-email" placeholder="Email">
+            <input type="password" id="auth-pass" placeholder="Password (Min 6 chars)">
+            <button class="btn-pulse" style="float:none; width:100%; margin-top:10px;" onclick="processAuth()">Continue</button>
+            <p style="margin-top:20px; color:var(--gray); cursor:pointer" onclick="toggleAuth()">New? <span style="color:white">Create Account</span></p>
         </div>
     </div>
 
     <div id="app-view" class="app-grid hidden">
         <aside>
             <div class="logo" style="font-size: 3rem;">0</div>
-            <div class="nav-link active"><i class="fa-solid fa-house"></i> <span class="nav-text">Home</span></div>
-            <div class="nav-link"><i class="fa-solid fa-magnifying-glass"></i> <span class="nav-text">Explore</span></div>
-            <div class="nav-link"><i class="fa-solid fa-user"></i> <span class="nav-text">Profile</span></div>
-            <button class="btn-pulse" onclick="logout()" style="margin-top:auto; background:transparent; border:1px solid var(--border); width: 100%;">Logout</button>
+            <div style="font-size:1.2rem; font-weight:700; margin-bottom:20px;"><i class="fa-solid fa-house"></i> <span class="nav-text">Home</span></div>
+            <div style="font-size:1.2rem; font-weight:700; margin-bottom:20px;"><i class="fa-solid fa-user"></i> <span class="nav-text">Profile</span></div>
+            <button class="btn-pulse" onclick="logout()" style="background:transparent; border:1px solid var(--border); width:100%; margin-top:auto">Logout</button>
         </aside>
 
         <main>
             <div class="header">For You</div>
             <div class="composer">
-                <img id="my-avatar" class="avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=Zero">
+                <img id="my-avatar" class="avatar" src="">
                 <div style="flex:1">
-                    <textarea id="pulse-box" placeholder="What's the pulse today?"></textarea>
-                    <div style="display:flex; justify-content:flex-end; padding-top:10px; border-top: 1px solid #111;">
-                        <button class="btn-pulse" onclick="sendPulse()">PULSE</button>
-                    </div>
+                    <textarea id="post-input" placeholder="What's happening?"></textarea>
+                    <button class="btn-pulse" onclick="sendPulse()">PULSE</button>
                 </div>
             </div>
-            <div id="feed-container"></div>
+            <div id="feed"></div>
         </main>
 
-        <div class="right-panel">
-            <div class="widget">
-                <h3 style="margin-bottom:10px;">Who to follow</h3>
-                <div id="suggestions-box"></div>
+        <aside class="right-sidebar" style="border-left: 1px solid var(--border); border-right:none">
+            <div style="background:#111; padding:20px; border-radius:20px; margin:20px">
+                <h3 style="margin-bottom:15px">Suggested</h3>
+                <div id="suggestions"></div>
             </div>
-        </div>
+        </aside>
     </div>
 
     <script>
@@ -109,158 +90,122 @@
         const SB_KEY = 'sb_publishable_5WCnkOmfRZ4W3sTNDwtlpQ_pmIZi90g';
         const client = supabase.createClient(SB_URL, SB_KEY);
 
-        let currentUserProfile = null;
-        let isSignupMode = false;
+        let currentUser = null;
+        let isSignup = false;
 
         function toggleAuth() {
-            isSignupMode = !isSignupMode;
-            document.getElementById('signup-fields').classList.toggle('hidden');
-            document.getElementById('auth-title').innerText = isSignupMode ? "Create Zero Account" : "Sign in to Zero";
+            isSignup = !isSignup;
+            document.getElementById('signup-only').classList.toggle('hidden');
+            document.getElementById('auth-title').innerText = isSignup ? "Join Zero" : "Sign in to Zero";
         }
 
-        async function handleAuth() {
-            const email = document.getElementById('email-input').value;
-            const password = document.getElementById('pass-input').value;
+        async function processAuth() {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-pass').value;
 
-            if (isSignupMode) {
-                const name = document.getElementById('name-input').value;
-                if(!name || password.length < 6) return alert("Please enter name and password (min 6 chars)");
-
+            if (isSignup) {
+                const name = document.getElementById('reg-name').value;
+                if(password.length < 6) return alert("Error: Password must be at least 6 characters.");
+                
                 const { data, error } = await client.auth.signUp({ email, password });
-                if (error) return alert("Error: " + error.message);
+                if (error) return alert("Signup Error: " + error.message);
 
-                // Auto-seed data for Rehan and Zero
-                let bio = "GenZ Pulse User";
-                let verified = false;
-                let handle = "@" + name.toLowerCase().replace(/\s/g, '');
+                // Setup default profiles for your requested accounts
+                let bio = "Pulse User"; let verified = false;
+                if(name.toUpperCase() === "REHAN RS") { bio = "Founder and CEO of @ZERO"; verified = true; }
+                if(name.toUpperCase() === "ZERO") { bio = "India's own GenZ Social Media"; verified = true; }
 
-                if(name.toUpperCase() === "REHAN RS") { bio = "founder and CEO of @ZERO"; verified = true; handle = "@rehan_rs"; }
-                if(name.toUpperCase() === "ZERO") { bio = "indias own genz social media"; verified = true; handle = "@zero_india"; }
-
-                const { error: pError } = await client.from('profiles').insert([{
-                    id: data.user.id, username: name, handle: handle,
+                await client.from('profiles').insert([{
+                    id: data.user.id, username: name, 
+                    handle: "@"+name.toLowerCase().replace(/\s/g,''),
                     bio: bio, is_verified: verified,
                     avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`
                 }]);
-
-                if(pError) console.error("Profile creation failed:", pError);
-                
-                // Add initial post for defaults
-                if(verified) {
-                    await client.from('posts').insert([{ user_id: data.user.id, content: verified && name.toUpperCase() === "REHAN RS" ? "The revolution begins today. Welcome to ZERO. 🚀" : "India's own GenZ platform is now LIVE! 🇮🇳" }]);
-                }
 
                 alert("Account created! Please Sign In.");
                 location.reload();
             } else {
                 const { error } = await client.auth.signInWithPassword({ email, password });
-                if (error) alert("Login Error: " + error.message);
-                else checkSession();
+                if (error) alert("Login Error: " + error.message + " (Check if email is confirmed)");
+                else initApp();
             }
         }
 
-        async function checkSession() {
+        async function initApp() {
             const { data: { user } } = await client.auth.getUser();
             if (!user) return;
 
-            // Fetch profile - using maybeSingle to avoid 406 errors
             const { data: profile } = await client.from('profiles').select('*').eq('id', user.id).maybeSingle();
-
+            
             if (!profile) {
-                // Recovery: If auth exists but profile doesn't, create it
-                await client.from('profiles').insert([{ id: user.id, username: "Pulse User", handle: "@user_"+user.id.slice(0,4), avatar_url: `https://api.dicebear.com/7.x/bottts/svg?seed=${user.id}` }]);
-                return checkSession();
+                // Auto-fix missing profile
+                await client.from('profiles').insert([{ id: user.id, username: "Guest", handle: "@user_"+user.id.slice(0,4), avatar_url: "https://api.dicebear.com/7.x/bottts/svg?seed=guest" }]);
+                return initApp();
             }
 
-            currentUserProfile = profile;
+            currentUser = profile;
             document.getElementById('auth-overlay').classList.add('hidden');
             document.getElementById('app-view').classList.remove('hidden');
             document.getElementById('my-avatar').src = profile.avatar_url;
-
             loadFeed();
             loadSuggestions();
         }
 
         async function loadFeed() {
-            const { data: posts } = await client.from('posts')
-                .select(`id, content, profiles(username, handle, avatar_url, is_verified)`)
-                .order('created_at', { ascending: false });
+            const { data: posts } = await client.from('posts').select(`id, content, profiles(username, handle, avatar_url, is_verified)`).order('created_at', { ascending: false });
+            const { data: likes } = await client.from('likes').select('post_id').eq('user_id', currentUser.id);
+            const likedSet = new Set(likes?.map(l => l.post_id));
 
-            const { data: myLikes } = await client.from('likes').select('post_id').eq('user_id', currentUserProfile.id);
-            const likedIds = new Set(myLikes?.map(l => l.post_id));
-
-            const container = document.getElementById('feed-container');
-            container.innerHTML = posts.map(p => {
-                const isLiked = likedIds.has(p.id);
-                return `
+            document.getElementById('feed').innerHTML = posts.map(p => `
                 <div class="post">
-                    <img src="${p.profiles?.avatar_url || ''}" class="avatar">
+                    <img src="${p.profiles?.avatar_url}" class="avatar">
                     <div style="flex:1">
-                        <div class="user-meta">
-                            ${p.profiles?.username || 'User'} 
-                            ${p.profiles?.is_verified ? '<i class="fa-solid fa-circle-check" style="color:var(--verify)"></i>' : ''}
-                            <span class="handle">${p.profiles?.handle || ''}</span>
-                        </div>
+                        <div class="username">${p.profiles?.username} ${p.profiles?.is_verified ? '<i class="fa-solid fa-circle-check" style="color:var(--verify)"></i>' : ''} <span class="handle">${p.profiles?.handle}</span></div>
                         <div class="content">${p.content}</div>
                         <div class="actions">
                             <i class="fa-regular fa-comment"></i>
-                            <i class="fa-solid fa-retweet"></i>
-                            <i class="${isLiked ? 'fa-solid liked' : 'fa-regular'} fa-heart" onclick="handleLike(${p.id}, this)"></i>
+                            <i class="${likedSet.has(p.id) ? 'fa-solid liked' : 'fa-regular'} fa-heart" onclick="toggleLike(${p.id}, this)"></i>
                             <i class="fa-solid fa-share-nodes"></i>
                         </div>
                     </div>
                 </div>
-            `}).join('');
-        }
-
-        async function handleLike(postId, icon) {
-            const isLiked = icon.classList.contains('liked');
-            if (isLiked) {
-                await client.from('likes').delete().eq('post_id', postId).eq('user_id', currentUserProfile.id);
-                icon.classList.replace('fa-solid', 'fa-regular');
-                icon.classList.remove('liked');
-            } else {
-                await client.from('likes').insert([{ post_id: postId, user_id: currentUserProfile.id }]);
-                icon.classList.replace('fa-regular', 'fa-solid');
-                icon.classList.add('liked');
-            }
+            `).join('');
         }
 
         async function sendPulse() {
-            const content = document.getElementById('pulse-box').value;
+            const content = document.getElementById('post-input').value;
             if(!content) return;
-            const { error } = await client.from('posts').insert([{ user_id: currentUserProfile.id, content: content }]);
-            if(error) alert("Post failed: " + error.message);
-            document.getElementById('pulse-box').value = '';
+            await client.from('posts').insert([{ user_id: currentUser.id, content: content }]);
+            document.getElementById('post-input').value = '';
             loadFeed();
         }
 
+        async function toggleLike(postId, el) {
+            if(el.classList.contains('liked')) {
+                await client.from('likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
+                el.classList.remove('fa-solid', 'liked'); el.classList.add('fa-regular');
+            } else {
+                await client.from('likes').insert([{ post_id: postId, user_id: currentUser.id }]);
+                el.classList.add('fa-solid', 'liked'); el.classList.remove('fa-regular');
+            }
+        }
+
         async function loadSuggestions() {
-            const { data: users } = await client.from('profiles').select('*').neq('id', currentUserProfile.id).limit(4);
-            const box = document.getElementById('suggestions-box');
-            box.innerHTML = users.map(u => `
-                <div class="suggested-user">
+            const { data: users } = await client.from('profiles').select('*').neq('id', currentUser.id).limit(3);
+            document.getElementById('suggestions').innerHTML = users.map(u => `
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px">
                     <img src="${u.avatar_url}" class="avatar" style="width:35px; height:35px">
-                    <div>
-                        <div style="font-size:0.9rem; font-weight:800">${u.username} ${u.is_verified ? '✔️' : ''}</div>
-                        <div class="handle" style="font-size:0.75rem">${u.handle}</div>
+                    <div style="flex:1; font-size:0.9rem">
+                        <div style="font-weight:700">${u.username}</div>
+                        <div style="color:var(--gray)">${u.handle}</div>
                     </div>
-                    <button class="btn-follow" onclick="followUser('${u.id}', this)">Follow</button>
+                    <button class="btn-follow" style="background:white; color:black; border:none; padding:5px 12px; border-radius:20px; font-weight:700" onclick="alert('Followed!')">Follow</button>
                 </div>
             `).join('');
         }
 
-        async function followUser(targetId, btn) {
-            await client.from('follows').insert([{ follower_id: currentUserProfile.id, following_id: targetId }]);
-            btn.innerText = "Following";
-            btn.style.background = "transparent";
-            btn.style.color = "white";
-            btn.style.border = "1px solid var(--border)";
-        }
-
         async function logout() { await client.auth.signOut(); location.reload(); }
-
-        checkSession();
+        initApp();
     </script>
 </body>
 </html>

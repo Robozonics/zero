@@ -3,66 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZERO | Bharat's Pulse</title>
+    <title>ZERO | The Pulse</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --bg: #000; --accent: #ff5722; --pink: #f700ff; --border: #262626; --gray: #71767b; --verify: #1d9bf0; }
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background: var(--bg); color: white; overflow-x: hidden; }
+        :root { --bg: #000; --accent: #ff5722; --pink: #f700ff; --border: #262626; --gray: #71767b; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: white; }
         .hidden { display: none !important; }
-
+        
         /* Layout */
         .app-grid { display: grid; grid-template-columns: 275px 1fr 350px; max-width: 1250px; margin: 0 auto; min-height: 100vh; }
-        aside { padding: 20px; border-right: 1px solid var(--border); position: sticky; top: 0; height: 100vh; }
-        .logo { font-size: 3.5rem; font-weight: 900; background: linear-gradient(to bottom, var(--accent), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; letter-spacing: -4px; }
+        aside { padding: 20px; border-right: 1px solid var(--border); position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; }
+        .logo { font-size: 3.5rem; font-weight: 900; background: linear-gradient(to bottom, var(--accent), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -5px; margin-bottom: 20px; }
         
-        /* Main Feed */
+        /* Feed */
         main { border-right: 1px solid var(--border); }
-        .header { padding: 15px 20px; font-weight: 800; font-size: 1.2rem; border-bottom: 1px solid var(--border); sticky; top: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
+        .header { padding: 15px 20px; font-weight: 800; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 10; }
         .composer { padding: 20px; border-bottom: 1px solid var(--border); display: flex; gap: 15px; }
-        .avatar { width: 48px; height: 48px; border-radius: 50%; background: #222; object-fit: cover; }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #222; object-fit: cover; }
         textarea { width: 100%; background: transparent; border: none; color: white; font-size: 1.2rem; outline: none; resize: none; margin-top: 10px; }
-        .btn-pulse { background: linear-gradient(135deg, var(--accent), var(--pink)); color: white; border: none; padding: 10px 25px; border-radius: 30px; font-weight: 800; cursor: pointer; float: right; }
-
-        /* Post Cards */
-        .post { padding: 20px; border-bottom: 1px solid var(--border); display: flex; gap: 15px; transition: 0.2s; }
-        .post:hover { background: #080808; }
-        .username { font-weight: 800; display: flex; align-items: center; gap: 4px; }
-        .handle { color: var(--gray); font-weight: 400; font-size: 0.9rem; }
-        .actions { display: flex; gap: 50px; margin-top: 12px; color: var(--gray); }
-        .liked { color: #f91880 !important; }
+        .btn-pulse { background: linear-gradient(135deg, var(--accent), var(--pink)); color: white; border: none; padding: 10px 25px; border-radius: 30px; font-weight: 800; cursor: pointer; }
 
         /* Auth Screen */
-        #auth-overlay { position: fixed; inset: 0; background: black; z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        #auth-view { position: fixed; inset: 0; background: black; z-index: 1000; display: flex; justify-content: center; align-items: center; }
         .auth-card { width: 380px; padding: 40px; border: 1px solid var(--border); border-radius: 24px; text-align: center; }
-        input { width: 100%; padding: 14px; margin: 8px 0; background: #111; border: 1px solid var(--border); color: white; border-radius: 10px; font-size: 1rem; }
-        
-        @media (max-width: 1000px) { .app-grid { grid-template-columns: 80px 1fr 0; } .nav-text, .right-sidebar { display: none; } }
+        input { width: 100%; padding: 14px; margin: 10px 0; background: #111; border: 1px solid var(--border); color: white; border-radius: 10px; font-size: 1rem; }
     </style>
 </head>
 <body>
 
-    <div id="auth-overlay">
+    <div id="auth-view">
         <div class="auth-card">
             <div class="logo">0</div>
             <h2 id="auth-title">Sign in to Zero</h2>
-            <div id="signup-only" class="hidden">
-                <input type="text" id="reg-name" placeholder="Full Name (REHAN RS / ZERO)">
-            </div>
+            <input type="text" id="reg-name" class="hidden" placeholder="Full Name (REHAN RS / ZERO)">
             <input type="email" id="auth-email" placeholder="Email">
-            <input type="password" id="auth-pass" placeholder="Password (Min 6 chars)">
-            <button class="btn-pulse" style="float:none; width:100%; margin-top:10px;" onclick="processAuth()">Continue</button>
-            <p style="margin-top:20px; color:var(--gray); cursor:pointer" onclick="toggleAuth()">New? <span style="color:white">Create Account</span></p>
+            <input type="password" id="auth-pass" placeholder="Password (Min 6 characters)">
+            <button class="btn-pulse" style="width:100%; margin-top:10px;" onclick="handleAuth()">Continue</button>
+            <p style="margin-top:20px; color:var(--gray); cursor:pointer" onclick="toggleAuth()">New to Zero? <span style="color:white">Create Account</span></p>
         </div>
     </div>
 
     <div id="app-view" class="app-grid hidden">
         <aside>
             <div class="logo" style="font-size: 3rem;">0</div>
-            <div style="font-size:1.2rem; font-weight:700; margin-bottom:20px;"><i class="fa-solid fa-house"></i> <span class="nav-text">Home</span></div>
-            <div style="font-size:1.2rem; font-weight:700; margin-bottom:20px;"><i class="fa-solid fa-user"></i> <span class="nav-text">Profile</span></div>
-            <button class="btn-pulse" onclick="logout()" style="background:transparent; border:1px solid var(--border); width:100%; margin-top:auto">Logout</button>
+            <div style="font-size:1.2rem; font-weight:700; margin-bottom:20px;"><i class="fa-solid fa-house"></i> Home</div>
+            <button class="btn-pulse" onclick="logout()" style="margin-top:auto; background:none; border:1px solid var(--border)">Logout</button>
         </aside>
 
         <main>
@@ -70,17 +57,18 @@
             <div class="composer">
                 <img id="my-avatar" class="avatar" src="">
                 <div style="flex:1">
-                    <textarea id="post-input" placeholder="What's happening?"></textarea>
-                    <button class="btn-pulse" onclick="sendPulse()">PULSE</button>
+                    <textarea id="post-input" placeholder="What's the pulse?"></textarea>
+                    <button class="btn-pulse" style="float:right" onclick="createPost()">PULSE</button>
                 </div>
             </div>
             <div id="feed"></div>
         </main>
 
-        <aside class="right-sidebar" style="border-left: 1px solid var(--border); border-right:none">
-            <div style="background:#111; padding:20px; border-radius:20px; margin:20px">
-                <h3 style="margin-bottom:15px">Suggested</h3>
-                <div id="suggestions"></div>
+        <aside style="padding:20px">
+            <div style="background:#111; padding:20px; border-radius:20px">
+                <h3 style="margin-bottom:10px">Verified Accounts</h3>
+                <p style="color:var(--gray); margin-bottom:5px">✔️ REHAN RS</p>
+                <p style="color:var(--gray)">✔️ ZERO Official</p>
             </div>
         </aside>
     </div>
@@ -90,43 +78,40 @@
         const SB_KEY = 'sb_publishable_5WCnkOmfRZ4W3sTNDwtlpQ_pmIZi90g';
         const client = supabase.createClient(SB_URL, SB_KEY);
 
-        let currentUser = null;
+        let userProfile = null;
         let isSignup = false;
 
         function toggleAuth() {
             isSignup = !isSignup;
-            document.getElementById('signup-only').classList.toggle('hidden');
+            document.getElementById('reg-name').classList.toggle('hidden');
             document.getElementById('auth-title').innerText = isSignup ? "Join Zero" : "Sign in to Zero";
         }
 
-        async function processAuth() {
+        async function handleAuth() {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-pass').value;
 
             if (isSignup) {
                 const name = document.getElementById('reg-name').value;
-                if(password.length < 6) return alert("Error: Password must be at least 6 characters.");
-                
+                if(password.length < 6) return alert("Password must be at least 6 characters!");
+
                 const { data, error } = await client.auth.signUp({ email, password });
                 if (error) return alert("Signup Error: " + error.message);
 
-                // Setup default profiles for your requested accounts
-                let bio = "Pulse User"; let verified = false;
-                if(name.toUpperCase() === "REHAN RS") { bio = "Founder and CEO of @ZERO"; verified = true; }
-                if(name.toUpperCase() === "ZERO") { bio = "India's own GenZ Social Media"; verified = true; }
-
+                // Auto-create profile
+                let verified = (name.toUpperCase() === "REHAN RS" || name.toUpperCase() === "ZERO");
                 await client.from('profiles').insert([{
                     id: data.user.id, username: name, 
-                    handle: "@"+name.toLowerCase().replace(/\s/g,''),
-                    bio: bio, is_verified: verified,
+                    handle: "@" + name.toLowerCase().replace(/\s/g, ''),
+                    is_verified: verified,
                     avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`
                 }]);
 
-                alert("Account created! Please Sign In.");
+                alert("Account created! Please Sign In now.");
                 location.reload();
             } else {
                 const { error } = await client.auth.signInWithPassword({ email, password });
-                if (error) alert("Login Error: " + error.message + " (Check if email is confirmed)");
+                if (error) alert("Login Failed: " + error.message + "\n(Make sure your password is correct and email is confirmed)");
                 else initApp();
             }
         }
@@ -138,70 +123,38 @@
             const { data: profile } = await client.from('profiles').select('*').eq('id', user.id).maybeSingle();
             
             if (!profile) {
-                // Auto-fix missing profile
-                await client.from('profiles').insert([{ id: user.id, username: "Guest", handle: "@user_"+user.id.slice(0,4), avatar_url: "https://api.dicebear.com/7.x/bottts/svg?seed=guest" }]);
+                // If profile is missing, create a guest one to prevent crashing
+                await client.from('profiles').insert([{ id: user.id, username: "Pulse User", handle: "@user_"+user.id.slice(0,4), avatar_url: "https://api.dicebear.com/7.x/bottts/svg?seed=zero" }]);
                 return initApp();
             }
 
-            currentUser = profile;
-            document.getElementById('auth-overlay').classList.add('hidden');
+            userProfile = profile;
+            document.getElementById('auth-view').classList.add('hidden');
             document.getElementById('app-view').classList.remove('hidden');
             document.getElementById('my-avatar').src = profile.avatar_url;
             loadFeed();
-            loadSuggestions();
         }
 
         async function loadFeed() {
-            const { data: posts } = await client.from('posts').select(`id, content, profiles(username, handle, avatar_url, is_verified)`).order('created_at', { ascending: false });
-            const { data: likes } = await client.from('likes').select('post_id').eq('user_id', currentUser.id);
-            const likedSet = new Set(likes?.map(l => l.post_id));
-
-            document.getElementById('feed').innerHTML = posts.map(p => `
-                <div class="post">
+            const { data: posts } = await client.from('posts').select(`content, profiles(username, handle, avatar_url, is_verified)`).order('created_at', {ascending: false});
+            const feed = document.getElementById('feed');
+            feed.innerHTML = posts.map(p => `
+                <div style="padding:20px; border-bottom:1px solid var(--border); display:flex; gap:15px">
                     <img src="${p.profiles?.avatar_url}" class="avatar">
-                    <div style="flex:1">
-                        <div class="username">${p.profiles?.username} ${p.profiles?.is_verified ? '<i class="fa-solid fa-circle-check" style="color:var(--verify)"></i>' : ''} <span class="handle">${p.profiles?.handle}</span></div>
-                        <div class="content">${p.content}</div>
-                        <div class="actions">
-                            <i class="fa-regular fa-comment"></i>
-                            <i class="${likedSet.has(p.id) ? 'fa-solid liked' : 'fa-regular'} fa-heart" onclick="toggleLike(${p.id}, this)"></i>
-                            <i class="fa-solid fa-share-nodes"></i>
-                        </div>
+                    <div>
+                        <div style="font-weight:800">${p.profiles?.username} ${p.profiles?.is_verified ? '✔️' : ''} <span style="color:var(--gray); font-weight:400">${p.profiles?.handle}</span></div>
+                        <div style="margin-top:5px; line-height:1.5">${p.content}</div>
                     </div>
                 </div>
             `).join('');
         }
 
-        async function sendPulse() {
-            const content = document.getElementById('post-input').value;
-            if(!content) return;
-            await client.from('posts').insert([{ user_id: currentUser.id, content: content }]);
+        async function createPost() {
+            const text = document.getElementById('post-input').value;
+            if(!text) return;
+            await client.from('posts').insert([{ user_id: userProfile.id, content: text }]);
             document.getElementById('post-input').value = '';
             loadFeed();
-        }
-
-        async function toggleLike(postId, el) {
-            if(el.classList.contains('liked')) {
-                await client.from('likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
-                el.classList.remove('fa-solid', 'liked'); el.classList.add('fa-regular');
-            } else {
-                await client.from('likes').insert([{ post_id: postId, user_id: currentUser.id }]);
-                el.classList.add('fa-solid', 'liked'); el.classList.remove('fa-regular');
-            }
-        }
-
-        async function loadSuggestions() {
-            const { data: users } = await client.from('profiles').select('*').neq('id', currentUser.id).limit(3);
-            document.getElementById('suggestions').innerHTML = users.map(u => `
-                <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px">
-                    <img src="${u.avatar_url}" class="avatar" style="width:35px; height:35px">
-                    <div style="flex:1; font-size:0.9rem">
-                        <div style="font-weight:700">${u.username}</div>
-                        <div style="color:var(--gray)">${u.handle}</div>
-                    </div>
-                    <button class="btn-follow" style="background:white; color:black; border:none; padding:5px 12px; border-radius:20px; font-weight:700" onclick="alert('Followed!')">Follow</button>
-                </div>
-            `).join('');
         }
 
         async function logout() { await client.auth.signOut(); location.reload(); }

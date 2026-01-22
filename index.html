@@ -4,363 +4,258 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>ZERO | The Pulse of Bharat</title>
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #000000;
-            --surface: #0a0a0a;
-            --surface-bright: #16181c;
-            --border: #2f3336;
-            --accent: #ff5722;
-            --accent-glow: rgba(255, 87, 34, 0.3);
-            --text: #eff3f4;
-            --dim: #71767b;
-            --verify: #1d9bf0;
-            --heart: #f91880;
+            --bg: #000000; --surface: #0a0a0a; --surface-bright: #16181c;
+            --border: #2f3336; --accent: #ff5722; --text: #eff3f4;
+            --dim: #71767b; --verify: #1d9bf0; --heart: #f91880;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--bg); color: var(--text); overflow-x: hidden; }
         .hidden { display: none !important; }
-        button { cursor: pointer; transition: 0.2s; border: none; background: none; }
-        button:hover { opacity: 0.8; }
-
-        /* --- AUTH SYSTEM --- */
-        #auth-gate {
-            position: fixed; inset: 0; background: #000; z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .auth-card {
-            width: 100%; max-width: 420px; padding: 40px;
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 28px; text-align: center;
-        }
-        .logo-xl { font-size: 4rem; font-weight: 900; color: var(--accent); margin-bottom: 20px; }
-        .social-btn {
-            width: 100%; padding: 14px; margin: 8px 0; border-radius: 50px;
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-            font-weight: 700; font-size: 1rem; border: 1px solid var(--border);
-            background: white; color: black;
-        }
-        .btn-insta { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; border: none; }
-        .auth-input {
-            width: 100%; padding: 16px; margin: 8px 0; background: #000;
-            border: 1px solid var(--border); color: white; border-radius: 12px;
-        }
-
-        /* --- LAYOUT --- */
+        button { cursor: pointer; transition: 0.2s; border: none; }
+        
+        /* Layout Grid */
         .app-shell {
             display: grid; grid-template-columns: 275px 600px 1fr;
             max-width: 1250px; margin: 0 auto; min-height: 100vh;
         }
 
+        /* Nav Sidebar */
         nav { padding: 10px 15px; border-right: 1px solid var(--border); position: sticky; top:0; height: 100vh; display: flex; flex-direction: column; }
-        .nav-link {
-            padding: 12px 20px; border-radius: 50px; font-size: 1.25rem;
-            display: flex; align-items: center; gap: 20px; margin-bottom: 5px;
-        }
-        .nav-link.active { font-weight: 900; }
+        .logo { font-size: 3rem; font-weight: 900; color: var(--accent); margin: 10px 0 20px 10px; cursor: pointer; }
+        .nav-link { padding: 12px 20px; border-radius: 50px; font-size: 1.25rem; display: flex; align-items: center; gap: 20px; margin-bottom: 5px; cursor: pointer; }
         .nav-link:hover { background: var(--surface-bright); }
+        .nav-link.active { font-weight: 900; }
 
-        /* --- FEED --- */
-        main { border-right: 1px solid var(--border); }
-        .view-header {
-            padding: 15px 20px; font-size: 1.3rem; font-weight: 800;
-            border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10;
-        }
+        /* Main Feed */
+        main { border-right: 1px solid var(--border); min-height: 100vh; }
+        .header { padding: 15px 20px; font-size: 1.3rem; font-weight: 800; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+        
         .composer { padding: 20px; border-bottom: 1px solid var(--border); display: flex; gap: 15px; }
         .avatar { width: 48px; height: 48px; border-radius: 50%; background: #222; object-fit: cover; }
-        textarea { width: 100%; font-size: 1.3rem; color: white; resize: none; margin-top: 10px; min-height: 80px; }
+        textarea { width: 100%; font-size: 1.3rem; color: white; border: none; background: none; outline: none; resize: none; margin-top: 10px; min-height: 80px; }
         
-        .pulse-card { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; transition: 0.2s; }
+        .pulse-card { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; transition: 0.1s; }
         .pulse-card:hover { background: rgba(255,255,255,0.02); }
-        .verify-badge { color: var(--verify); font-size: 0.9rem; margin-left: 4px; }
+        .action-bar { display: flex; justify-content: space-between; max-width: 425px; margin-top: 12px; color: var(--dim); }
+        .action-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; }
+        .action-btn:hover { color: var(--accent); }
+        .liked { color: var(--heart) !important; }
+
+        /* Auth Gate */
+        #auth-gate { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .auth-card { width: 400px; padding: 40px; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; text-align: center; }
+        .social-btn { width: 100%; padding: 14px; margin: 8px 0; border-radius: 50px; display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: 700; background: white; color: black; }
+        .insta-btn { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; }
+        .input-box { width: 100%; padding: 15px; margin: 8px 0; background: #000; border: 1px solid var(--border); color: white; border-radius: 10px; }
         
-        .btn-pulse-primary {
-            background: var(--accent); color: white; padding: 12px 24px;
-            border-radius: 50px; font-weight: 800; font-size: 1rem;
-            box-shadow: 0 4px 15px var(--accent-glow);
-        }
-
-        /* --- SIDEBAR --- */
-        .sidebar-right { padding: 20px; }
-        .trending-box { background: var(--surface-bright); border-radius: 20px; padding: 20px; }
-
-        @media (max-width: 1000px) {
-            .app-shell { grid-template-columns: 80px 1fr 0; }
-            .nav-text, .sidebar-right { display: none; }
-        }
+        .btn-pulse { background: var(--accent); color: white; padding: 12px 24px; border-radius: 50px; font-weight: 800; width: 100%; margin-top: 10px; }
+        
+        @media (max-width: 1000px) { .app-shell { grid-template-columns: 80px 1fr 0; } .nav-text { display: none; } }
     </style>
 </head>
 <body>
 
     <div id="auth-gate">
         <div class="auth-card">
-            <div class="logo-xl">0</div>
-            <h2 style="margin-bottom: 25px; font-weight: 800;">What's happening?</h2>
-            
-            <button class="social-btn" onclick="auth.social('google')">
-                <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="18"> Continue with Google
-            </button>
-            <button class="social-btn btn-insta" onclick="auth.social('instagram')">
-                <i class="fa-brands fa-instagram"></i> Continue with Instagram
-            </button>
-
-            <div style="margin: 20px 0; color: var(--dim);">or use email</div>
-
-            <div id="register-fields" class="hidden">
-                <input type="text" id="auth-username" class="auth-input" placeholder="Full Name">
-            </div>
-            <input type="email" id="auth-email" class="auth-input" placeholder="Email">
-            <input type="password" id="auth-password" class="auth-input" placeholder="Password">
-            
-            <button class="btn-pulse-primary" style="width: 100%; margin-top: 10px;" onclick="auth.process()" id="auth-btn">Sign In</button>
-            
-            <p style="margin-top: 20px; color: var(--dim); cursor: pointer;" onclick="auth.toggleMode()">
-                <span id="auth-toggle-text">New to Zero? Create account</span>
-            </p>
+            <div class="logo">0</div>
+            <h2 style="margin-bottom: 20px;">Join the Pulse</h2>
+            <button class="social-btn" onclick="auth.social('google')"><img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="18"> Google</button>
+            <button class="social-btn insta-btn" onclick="auth.social('instagram')"><i class="fa-brands fa-instagram"></i> Instagram</button>
+            <div style="margin: 15px 0; color: var(--dim);">OR</div>
+            <input type="email" id="email" class="input-box" placeholder="Email">
+            <input type="password" id="pass" class="input-box" placeholder="Password">
+            <button class="btn-pulse" onclick="auth.login()">Sign In / Up</button>
         </div>
     </div>
 
     <div id="app" class="app-shell hidden">
         <nav>
-            <div class="logo-xl" style="font-size: 2.5rem; margin-left: 10px;">0</div>
+            <div class="logo">0</div>
             <div class="nav-link active" onclick="ui.view('home', this)"><i class="fa-solid fa-house"></i> <span class="nav-text">Home</span></div>
-            <div class="nav-link" onclick="ui.view('search', this)"><i class="fa-solid fa-magnifying-glass"></i> <span class="nav-text">Explore</span></div>
-            <div class="nav-link" onclick="ui.view('profile', this)"><i class="fa-solid fa-user"></i> <span class="nav-text">Profile</span></div>
-            <button class="btn-pulse-primary" style="margin-top: 20px; width: 90%;" onclick="ui.focusEditor()">Pulse</button>
+            <div class="nav-link" onclick="ui.view('search', this)"><i class="fa-solid fa-magnifying-glass"></i> <span class="nav-text">Search</span></div>
+            <div class="nav-link" onclick="engine.openProfile()"><i class="fa-solid fa-user"></i> <span class="nav-text">Profile</span></div>
+            <button class="btn-pulse" style="margin-top: 20px;" onclick="document.getElementById('p-input').focus()">Pulse</button>
             
             <div style="margin-top: auto; padding: 20px; cursor: pointer;" onclick="auth.logout()">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <img id="nav-avatar" class="avatar" style="width: 40px; height: 40px;">
-                    <div class="nav-text">
-                        <div id="nav-name" style="font-weight: 800; font-size: 0.9rem;">User</div>
-                        <div style="color: var(--dim); font-size: 0.8rem;">Logout</div>
-                    </div>
-                </div>
+                <img id="nav-ava" class="avatar" style="width:40px; height:40px">
+                <span class="nav-text" id="nav-u-name" style="margin-left:10px; font-weight:700">User</span>
             </div>
         </nav>
 
         <main>
-            <div id="v-home">
-                <div class="view-header">Home</div>
+            <section id="v-home">
+                <div class="header">Home</div>
                 <div class="composer">
-                    <img id="comp-avatar" class="avatar">
-                    <div style="flex: 1;">
-                        <textarea id="pulse-input" placeholder="What's the pulse, Bharat?"></textarea>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                            <div style="color: var(--accent); display: flex; gap: 20px; font-size: 1.1rem;">
-                                <i class="fa-regular fa-image"></i><i class="fa-solid fa-list-ul"></i><i class="fa-regular fa-face-smile"></i>
-                            </div>
-                            <button class="btn-pulse-primary" onclick="engine.createPulse()">Pulse</button>
-                        </div>
+                    <img id="comp-ava" class="avatar">
+                    <div style="flex:1">
+                        <textarea id="p-input" placeholder="What's happening?"></textarea>
+                        <div style="text-align: right;"><button class="btn-pulse" style="width:auto" onclick="engine.post()">Pulse</button></div>
                     </div>
                 </div>
-                <div id="feed-root"></div>
-            </div>
+                <div id="feed"></div>
+            </section>
 
-            <div id="v-search" class="hidden">
-                <div class="view-header">Explore</div>
-                <div style="padding: 20px;">
-                    <input type="text" class="auth-input" style="border-radius: 50px; padding: 15px 25px;" placeholder="Search people..." oninput="engine.search(this.value)">
-                    <div id="search-root"></div>
+            <section id="v-search" class="hidden">
+                <div class="header">Explore</div>
+                <div style="padding:20px">
+                    <input type="text" class="input-box" placeholder="Search Bharat..." oninput="engine.search(this.value)">
+                    <div id="search-results"></div>
                 </div>
-            </div>
+            </section>
 
-            <div id="v-profile" class="hidden">
-                <div class="view-header" id="prof-header">Profile</div>
-                <div style="height: 180px; background: #111;"></div>
-                <div style="padding: 0 20px;">
-                    <img id="prof-avatar" class="avatar" style="width: 120px; height: 120px; border: 4px solid black; margin-top: -60px;">
-                    <h2 id="prof-name" style="margin-top: 10px; font-size: 1.5rem;">User Name</h2>
-                    <p id="prof-handle" style="color: var(--dim);">@handle</p>
-                    <div style="margin: 15px 0;">Official ZERO Pulse Member 🇮🇳</div>
+            <section id="v-profile" class="hidden">
+                <div class="header" id="prof-title">Profile</div>
+                <div style="height:150px; background:#111"></div>
+                <div style="padding:20px; position:relative">
+                    <img id="p-ava" class="avatar" style="width:100px; height:100px; border:4px solid #000; margin-top:-60px">
+                    <div id="follow-btn-container" style="position:absolute; top:20px; right:20px"></div>
+                    <h2 id="p-name" style="margin-top:10px">Name</h2>
+                    <p id="p-handle" style="color:var(--dim)">@handle</p>
                 </div>
-                <div id="user-pulses"></div>
-            </div>
+                <div id="user-feed"></div>
+            </section>
         </main>
 
-        <aside class="sidebar-right">
-            <div class="trending-box">
-                <h3 style="margin-bottom: 15px;">Trending in Bharat</h3>
-                <div style="margin-bottom: 15px;">
-                    <p style="color: var(--dim); font-size: 0.8rem;">Trending</p>
-                    <p style="font-weight: 800;">#ZeroNetwork</p>
-                    <p style="color: var(--dim); font-size: 0.8rem;">24.5K Pulses</p>
-                </div>
-                <div>
-                    <p style="color: var(--dim); font-size: 0.8rem;">Politics · Trending</p>
-                    <p style="font-weight: 800;">#DigitalBharat</p>
-                    <p style="color: var(--dim); font-size: 0.8rem;">12.1K Pulses</p>
-                </div>
+        <aside style="padding:20px" class="nav-text">
+            <div style="background:var(--surface-bright); padding:20px; border-radius:20px">
+                <h3>Trends</h3>
+                <p style="margin-top:15px; color:var(--dim)">#ZeroBharat</p>
+                <p style="color:var(--dim)">#DigitalPulse</p>
             </div>
         </aside>
     </div>
 
     <script>
-        // --- 1. CONFIGURATION ---
         const SB_URL = 'https://tsuiaealzqkkwmlwrdyn.supabase.co';
         const SB_KEY = 'sb_publishable_5WCnkOmfRZ4W3sTNDwtlpQ_pmIZi90g';
         const sb = supabase.createClient(SB_URL, SB_KEY);
 
-        let sessionUser = null;
-        let isSignup = false;
+        let userState = null;
 
-        // --- 2. AUTHENTICATION MODULE ---
         const auth = {
-            toggleMode() {
-                isSignup = !isSignup;
-                document.getElementById('register-fields').classList.toggle('hidden');
-                document.getElementById('auth-btn').innerText = isSignup ? "Create Account" : "Sign In";
-                document.getElementById('auth-toggle-text').innerText = isSignup ? "Already have an account? Sign In" : "New to Zero? Create account";
+            async social(p) { await sb.auth.signInWithOAuth({ provider: p }); },
+            async login() {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('pass').value;
+                const { data, error } = await sb.auth.signInWithPassword({ email, password });
+                if(error) {
+                    const { error: signUpError } = await sb.auth.signUp({ email, password });
+                    if(signUpError) alert(signUpError.message); else alert("Verify your email!");
+                } else { init(); }
             },
-            async social(provider) {
-                const { error } = await sb.auth.signInWithOAuth({ provider });
-                if(error) alert(error.message);
-            },
-            async process() {
-                const email = document.getElementById('auth-email').value;
-                const pass = document.getElementById('auth-password').value;
-
-                if(isSignup) {
-                    const name = document.getElementById('auth-username').value;
-                    const { data, error } = await sb.auth.signUp({ 
-                        email, password: pass, 
-                        options: { data: { full_name: name } }
-                    });
-                    if(error) return alert(error.message);
-                    alert("Success! Check email or Sign in.");
-                } else {
-                    const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-                    if(error) alert(error.message);
-                    else init();
-                }
-            },
-            async logout() {
-                await sb.auth.signOut();
-                location.reload();
-            }
+            logout() { sb.auth.signOut(); location.reload(); }
         };
 
-        // --- 3. UI CONTROLLER ---
         const ui = {
-            view(viewId, el) {
-                document.querySelectorAll('main > div').forEach(v => v.classList.add('hidden'));
-                document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-                document.getElementById('v-' + viewId).classList.remove('hidden');
-                if(el) el.classList.add('active');
-                
-                if(viewId === 'home') engine.loadFeed();
-                if(viewId === 'profile') engine.loadProfile();
-            },
-            focusEditor() {
-                this.view('home');
-                document.getElementById('pulse-input').focus();
+            view(id, el) {
+                document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
+                document.getElementById('v-' + id).classList.remove('hidden');
+                if(el) {
+                    document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+                    el.classList.add('active');
+                }
             }
         };
 
-        // --- 4. CORE ENGINE (CRITICAL FIXES HERE) ---
         const engine = {
             async loadFeed() {
-                const root = document.getElementById('feed-root');
-                // FIX: Explicit join profiles!user_id to solve PGRST201
-                const { data: pulses, error } = await sb
-                    .from('posts')
-                    .select('*, profiles!user_id(*)')
-                    .order('created_at', { ascending: false });
-
-                if(error) return console.error("PGRST ERROR:", error);
-
-                root.innerHTML = (pulses || []).map(p => this.template(p)).join('');
+                // PGRST201 FIX: Use profiles!user_id explicitly
+                const { data: posts } = await sb.from('posts').select('*, profiles!user_id(*)').order('created_at', {ascending: false});
+                const { data: likes } = await sb.from('likes').select('post_id').eq('user_id', userState.id);
+                const likedSet = new Set((likes || []).map(l => l.post_id));
+                
+                document.getElementById('feed').innerHTML = (posts || []).map(p => this.card(p, likedSet.has(p.id))).join('');
             },
 
-            template(p) {
-                const prof = p.profiles || { username: 'User', handle: '@user', avatar_url: '' };
+            card(p, isLiked) {
+                const u = p.profiles || { username: 'Anonymous', handle: '@user', avatar_url: '' };
                 return `
-                    <div class="pulse-card">
-                        <img src="${prof.avatar_url}" class="avatar">
-                        <div style="flex: 1;">
-                            <div style="font-weight: 800;">
-                                ${prof.username} ${prof.is_verified ? '<i class="fa-solid fa-circle-check verify-badge"></i>' : ''}
-                                <span style="color: var(--dim); font-weight: 400; margin-left: 5px;">${prof.handle}</span>
+                <div class="pulse-card">
+                    <img src="${u.avatar_url}" class="avatar" onclick="engine.openProfile('${u.id}')" style="cursor:pointer">
+                    <div style="flex:1">
+                        <div onclick="engine.openProfile('${u.id}')" style="cursor:pointer">
+                            <b>${u.username}</b> <span style="color:var(--dim)">${u.handle}</span>
+                        </div>
+                        <div style="margin-top:5px">${p.content}</div>
+                        <div class="action-bar">
+                            <div class="action-btn" onclick="engine.like(${p.id}, this)">
+                                <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart ${isLiked ? 'liked' : ''}"></i> ${p.likes_count || 0}
                             </div>
-                            <div style="margin-top: 5px; line-height: 1.5;">${p.content}</div>
-                            <div style="display: flex; justify-content: space-between; max-width: 400px; margin-top: 12px; color: var(--dim);">
-                                <span><i class="fa-regular fa-comment"></i> 0</span>
-                                <span><i class="fa-solid fa-retweet"></i> 0</span>
-                                <span onclick="engine.like(${p.id})"><i class="fa-regular fa-heart"></i> ${p.likes_count || 0}</span>
-                                <span><i class="fa-solid fa-share-nodes"></i></span>
-                            </div>
+                            <div class="action-btn"><i class="fa-solid fa-retweet"></i></div>
+                            <div class="action-btn"><i class="fa-solid fa-share"></i></div>
                         </div>
                     </div>
-                `;
+                </div>`;
             },
 
-            async createPulse() {
-                const text = document.getElementById('pulse-input').value;
-                if(!text) return;
-                
-                const { error } = await sb.from('posts').insert([{ 
-                    user_id: sessionUser.id, 
-                    content: text 
-                }]);
-                
-                if(error) alert(error.message);
-                else {
-                    document.getElementById('pulse-input').value = '';
-                    this.loadFeed();
+            async post() {
+                const content = document.getElementById('p-input').value;
+                if(!content) return;
+                await sb.from('posts').insert([{ user_id: userState.id, content }]);
+                document.getElementById('p-input').value = '';
+                this.loadFeed();
+            },
+
+            async like(id, el) {
+                const icon = el.querySelector('i');
+                if(icon.classList.contains('fa-solid')) {
+                    await sb.from('likes').delete().eq('post_id', id).eq('user_id', userState.id);
+                } else {
+                    await sb.from('likes').insert([{ post_id: id, user_id: userState.id }]);
                 }
+                this.loadFeed();
+            },
+
+            async openProfile(uid) {
+                const id = uid || userState.id;
+                ui.view('profile');
+                const { data: p } = await sb.from('profiles').select('*').eq('id', id).single();
+                document.getElementById('p-name').innerText = p.username;
+                document.getElementById('p-handle').innerText = p.handle;
+                document.getElementById('p-ava').src = p.avatar_url;
+                
+                // Set follow button
+                const btnBox = document.getElementById('follow-btn-container');
+                if(id !== userState.id) {
+                    btnBox.innerHTML = `<button class="btn-pulse" style="width:auto" onclick="engine.follow('${id}')">Follow</button>`;
+                } else { btnBox.innerHTML = ''; }
+
+                const { data: posts } = await sb.from('posts').select('*, profiles!user_id(*)').eq('user_id', id);
+                document.getElementById('user-feed').innerHTML = (posts || []).map(p => this.card(p, false)).join('');
+            },
+
+            async follow(targetId) {
+                await sb.from('follows').insert([{ follower_id: userState.id, following_id: targetId }]);
+                alert("Following!");
             },
 
             async search(q) {
                 if(q.length < 2) return;
-                const { data } = await sb.from('profiles').select('*').ilike('username', `%${q}%`);
-                document.getElementById('search-root').innerHTML = (data || []).map(u => `
-                    <div style="display: flex; align-items: center; gap: 15px; padding: 15px; border-bottom: 1px solid var(--border);">
+                const { data: users } = await sb.from('profiles').select('*').ilike('username', `%${q}%`);
+                document.getElementById('search-results').innerHTML = (users || []).map(u => `
+                    <div class="pulse-card" onclick="engine.openProfile('${u.id}')" style="cursor:pointer">
                         <img src="${u.avatar_url}" class="avatar">
-                        <div style="flex: 1;"><b>${u.username}</b><br><span style="color: var(--dim);">${u.handle}</span></div>
-                        <button class="btn-pulse-primary" style="padding: 5px 15px; font-size: 0.8rem;">Follow</button>
-                    </div>
-                `).join('');
-            },
-
-            async loadProfile() {
-                document.getElementById('prof-name').innerText = sessionUser.username;
-                document.getElementById('prof-handle').innerText = sessionUser.handle;
-                document.getElementById('prof-avatar').src = sessionUser.avatar_url;
-                
-                const { data } = await sb.from('posts').select('*, profiles!user_id(*)').eq('user_id', sessionUser.id);
-                document.getElementById('user-pulses').innerHTML = (data || []).map(p => this.template(p)).join('');
+                        <div><b>${u.username}</b><br><span style="color:var(--dim)">${u.handle}</span></div>
+                    </div>`).join('');
             }
         };
 
-        // --- 5. INITIALIZATION ---
         async function init() {
             const { data: { user } } = await sb.auth.getUser();
             if(!user) return;
-
             const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
-            
-            // Fallback if trigger hasn't finished
-            if(!profile) {
-                setTimeout(init, 1000); 
-                return;
-            }
-
-            sessionUser = profile;
+            if(!profile) return;
+            userState = profile;
             document.getElementById('auth-gate').classList.add('hidden');
             document.getElementById('app').classList.remove('hidden');
-            
-            // Sync UI
-            document.getElementById('nav-avatar').src = profile.avatar_url;
-            document.getElementById('comp-avatar').src = profile.avatar_url;
-            document.getElementById('nav-name').innerText = profile.username;
-
+            document.getElementById('nav-ava').src = profile.avatar_url;
+            document.getElementById('comp-ava').src = profile.avatar_url;
+            document.getElementById('nav-u-name').innerText = profile.username;
             engine.loadFeed();
         }
 

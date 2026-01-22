@@ -3,199 +3,683 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZERO | Pulse of Bharat</title>
+    <title>ZERO | The Pulse of Bharat</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@700&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --bg: #000; --border: #2f3336; --accent: #ff5722; --text: #eff3f4; --dim: #71767b; }
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); }
+        /* --- 1. GLOBAL RESET & VARS --- */
+        :root {
+            --bg-color: #000000;
+            --surface: #16181c;
+            --border: #2f3336;
+            --text-primary: #e7e9ea;
+            --text-secondary: #71767b;
+            --accent: #ff5722;
+            --accent-hover: #e64a19;
+            --twitter-blue: #1d9bf0;
+            --like-pink: #f91880;
+            --retweet-green: #00ba7c;
+            --backdrop: rgba(0, 0, 0, 0.65);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow-x: hidden;
+            font-size: 15px;
+        }
+        
+        button { cursor: pointer; border: none; outline: none; background: none; font-family: inherit; }
+        a { text-decoration: none; color: inherit; }
+        input, textarea { font-family: inherit; }
         .hidden { display: none !important; }
 
-        /* Layout */
-        .container { display: grid; grid-template-columns: 275px 600px 1fr; max-width: 1250px; margin: 0 auto; min-height: 100vh; }
+        /* --- 2. LAYOUT GRID --- */
+        .app-shell {
+            display: grid;
+            grid-template-columns: 275px 600px 350px;
+            max-width: 1265px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        /* --- 3. LEFT SIDEBAR (NAV) --- */
+        .sidebar-left {
+            position: sticky; top: 0; height: 100vh;
+            padding: 0 12px;
+            display: flex; flex-direction: column;
+            justify-content: space-between;
+            border-right: 1px solid var(--border);
+        }
         
-        /* Sidebar */
-        nav { padding: 10px 20px; border-right: 1px solid var(--border); position: sticky; top:0; height: 100vh; display: flex; flex-direction: column; }
-        .logo { font-size: 3rem; font-weight: 900; background: linear-gradient(to bottom, #ff5722, #f700ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; }
-        .nav-link { padding: 12px; font-size: 1.2rem; display: flex; align-items: center; gap: 15px; cursor: pointer; border-radius: 50px; margin-bottom: 5px; }
-        .nav-link:hover { background: #16181c; }
-        .btn-main-post { background: var(--accent); color: white; border: none; padding: 15px; border-radius: 50px; font-weight: 900; margin-top: 20px; cursor: pointer; }
+        .logo-area { padding: 14px 0; display: flex; align-items: center; }
+        .logo-text { 
+            font-family: 'Poppins', sans-serif; font-size: 2.2rem; 
+            background: linear-gradient(45deg, var(--accent), #f700ff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            letter-spacing: -2px; padding-left: 10px;
+        }
 
-        /* Feed */
-        main { border-right: 1px solid var(--border); }
-        .header { padding: 15px; font-size: 1.25rem; font-weight: 800; border-bottom: 1px solid var(--border); sticky; top:0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
-        .composer { padding: 15px; border-bottom: 1px solid var(--border); display: flex; gap: 15px; }
-        .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; background: #222; }
-        textarea { width: 100%; background: transparent; border: none; color: white; font-size: 1.2rem; outline: none; resize: none; margin-top: 10px; }
-        .post-btn-sm { background: var(--accent); color: white; border: none; padding: 8px 20px; border-radius: 50px; font-weight: 700; cursor: pointer; float: right; }
+        .nav-menu { margin-top: 10px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 20px;
+            padding: 12px 24px 12px 12px;
+            margin-bottom: 4px;
+            border-radius: 99px;
+            transition: 0.2s ease;
+            cursor: pointer;
+            width: fit-content;
+        }
+        .nav-item:hover { background-color: rgba(239, 243, 244, 0.1); }
+        .nav-item i { font-size: 1.7rem; color: var(--text-primary); }
+        .nav-item span { font-size: 1.25rem; font-weight: 500; margin-left: 20px; }
+        .nav-item.active i, .nav-item.active span { font-weight: 800; }
 
-        /* Posts */
-        .post { padding: 15px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; transition: 0.2s; cursor: pointer; }
-        .post:hover { background: rgba(255,255,255,0.03); }
-        .post-user { font-weight: 700; display: flex; align-items: center; gap: 4px; }
-        .verify { color: #1d9bf0; font-size: 0.9rem; }
-        .post-handle { color: var(--dim); font-weight: 400; font-size: 0.9rem; }
-        .post-content { margin-top: 5px; line-height: 1.5; }
-        .post-actions { display: flex; justify-content: space-between; max-width: 400px; margin-top: 12px; color: var(--dim); }
-        .post-actions i:hover { color: var(--accent); }
-        .liked { color: #f91880 !important; }
+        .btn-pulse-large {
+            margin-top: 24px;
+            background: var(--accent);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            width: 90%;
+            padding: 16px 0;
+            border-radius: 99px;
+            transition: 0.2s;
+            box-shadow: 0 4px 14px rgba(255, 87, 34, 0.4);
+        }
+        .btn-pulse-large:hover { background: var(--accent-hover); }
 
-        /* Auth */
-        #auth-overlay { position: fixed; inset: 0; background: black; z-index: 1000; display: flex; justify-content: center; align-items: center; }
-        .auth-card { width: 400px; padding: 40px; border: 1px solid var(--border); border-radius: 20px; text-align: center; }
-        input { width: 100%; padding: 15px; margin: 10px 0; background: #111; border: 1px solid var(--border); color: white; border-radius: 8px; }
+        .user-pill {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 99px;
+            display: flex; align-items: center; gap: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .user-pill:hover { background: rgba(239, 243, 244, 0.1); }
+        .pill-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .pill-info { flex: 1; line-height: 1.25; }
+        .pill-name { font-weight: 700; font-size: 0.95rem; }
+        .pill-handle { color: var(--text-secondary); font-size: 0.9rem; }
 
-        /* Right Sidebar */
-        .right-bar { padding: 20px; }
-        .widget { background: #16181c; border-radius: 15px; padding: 15px; margin-bottom: 20px; }
+        /* --- 4. MAIN FEED AREA --- */
+        .main-feed { border-right: 1px solid var(--border); position: relative; padding-bottom: 100vh; }
+        
+        .feed-header {
+            position: sticky; top: 0; z-index: 90;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 16px;
+        }
+        .header-title { height: 53px; display: flex; align-items: center; cursor: pointer; }
+        .header-title h2 { font-size: 1.25rem; font-weight: 700; }
+        
+        .feed-tabs { display: flex; border-bottom: 1px solid var(--border); }
+        .tab-item {
+            flex: 1; height: 53px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600; color: var(--text-secondary);
+            cursor: pointer; transition: 0.2s; position: relative;
+        }
+        .tab-item:hover { background: rgba(239, 243, 244, 0.1); }
+        .tab-item.active { color: var(--text-primary); }
+        .tab-indicator {
+            position: absolute; bottom: 0;
+            width: 60px; height: 4px;
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        /* Composer */
+        .composer { padding: 16px; display: flex; gap: 12px; border-bottom: 1px solid var(--border); }
+        .composer-avatar img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+        .composer-body { flex: 1; padding-top: 8px; }
+        .composer-input {
+            width: 100%; border: none; background: transparent;
+            color: white; font-size: 1.25rem; outline: none;
+            resize: none; min-height: 24px; max-height: 400px;
+        }
+        .composer-input::placeholder { color: var(--text-secondary); }
+        
+        .composer-tools {
+            margin-top: 12px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px;
+        }
+        .tool-icons { display: flex; gap: 4px; }
+        .tool-icon {
+            width: 34px; height: 34px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; color: var(--accent);
+            cursor: pointer; transition: 0.2s;
+        }
+        .tool-icon:hover { background: rgba(255, 87, 34, 0.1); }
+        
+        .btn-pulse-sm {
+            background: var(--accent); color: white;
+            padding: 8px 18px; border-radius: 99px;
+            font-weight: 700; font-size: 0.95rem;
+            opacity: 0.5; pointer-events: none; transition: 0.2s;
+        }
+        .btn-pulse-sm.active { opacity: 1; pointer-events: all; }
+
+        /* POST COMPONENT */
+        .post {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex; gap: 12px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .post:hover { background: rgba(255, 255, 255, 0.03); }
+        .post-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .post-content-area { flex: 1; }
+        
+        .post-meta { display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
+        .post-name { font-weight: 700; color: var(--text-primary); }
+        .post-handle, .post-time { color: var(--text-secondary); font-size: 0.95rem; }
+        .verified-badge { color: var(--twitter-blue); font-size: 0.9rem; }
+        
+        .post-text { font-size: 1rem; line-height: 1.5; color: var(--text-primary); white-space: pre-wrap; margin-bottom: 12px; }
+        
+        .post-actions { display: flex; justify-content: space-between; max-width: 425px; margin-top: 8px; }
+        .action-group {
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text-secondary); font-size: 13px;
+            group-hover: text-decoration: none; transition: 0.2s;
+        }
+        .action-icon-box {
+            width: 35px; height: 35px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        .action-group:hover.reply { color: var(--twitter-blue); }
+        .action-group:hover.reply .action-icon-box { background: rgba(29, 155, 240, 0.1); }
+        
+        .action-group:hover.repost { color: var(--retweet-green); }
+        .action-group:hover.repost .action-icon-box { background: rgba(0, 186, 124, 0.1); }
+        
+        .action-group:hover.like { color: var(--like-pink); }
+        .action-group:hover.like .action-icon-box { background: rgba(249, 24, 128, 0.1); }
+        
+        .liked { color: var(--like-pink) !important; }
+        .liked i { font-weight: 900 !important; }
+
+        /* --- 5. RIGHT SIDEBAR --- */
+        .sidebar-right { padding: 12px 0 12px 24px; position: sticky; top: 0; height: 100vh; }
+        
+        .search-container {
+            position: sticky; top: 0; z-index: 2;
+            background: var(--bg-color); padding-bottom: 12px;
+        }
+        .search-bar {
+            background: #202327; border-radius: 99px;
+            padding: 12px 20px; display: flex; align-items: center; gap: 12px;
+        }
+        .search-bar input {
+            background: transparent; border: none; color: white;
+            width: 100%; outline: none; font-size: 0.95rem;
+        }
+        .search-bar:focus-within { background: black; border: 1px solid var(--accent); }
+        
+        .widget-box {
+            background: #16181c; border-radius: 16px;
+            margin-bottom: 16px; overflow: hidden;
+        }
+        .widget-header { padding: 12px 16px; font-size: 1.25rem; font-weight: 800; }
+        
+        .trend-item {
+            padding: 12px 16px; cursor: pointer; transition: 0.2s;
+        }
+        .trend-item:hover { background: rgba(255,255,255,0.03); }
+        .trend-meta { font-size: 13px; color: var(--text-secondary); display: flex; justify-content: space-between; }
+        .trend-title { font-weight: 700; margin-top: 2px; }
+
+        /* --- 6. MODALS --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: var(--backdrop);
+            z-index: 999; display: flex; align-items: center; justify-content: center;
+        }
+        .modal-card {
+            background: black; width: 600px; max-width: 90vw;
+            border-radius: 16px; padding: 30px; position: relative;
+            max-height: 90vh; overflow-y: auto;
+        }
+        .close-modal {
+            position: absolute; top: 15px; left: 15px;
+            width: 30px; height: 30px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 1.2rem;
+        }
+        .close-modal:hover { background: rgba(255,255,255,0.1); }
+
+        /* Auth Form Styles */
+        .auth-logo { font-size: 3rem; margin-bottom: 20px; text-align: center; color: var(--text-primary); }
+        .auth-input {
+            width: 100%; background: black; border: 1px solid var(--border);
+            color: white; padding: 16px; font-size: 1rem;
+            margin-bottom: 20px; border-radius: 4px; outline: none;
+        }
+        .auth-input:focus { border-color: var(--accent); }
+        .auth-btn {
+            width: 100%; background: white; color: black;
+            padding: 14px; border-radius: 50px; font-weight: 700;
+            font-size: 1rem; margin-bottom: 20px; transition: 0.2s;
+        }
+        .auth-btn:hover { background: #dcdcdc; }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .app-shell { grid-template-columns: 80px 1fr 0; }
+            .sidebar-right { display: none; }
+            .nav-item span, .btn-pulse-large, .pill-info, .pill-dots { display: none; }
+            .nav-item { padding: 12px; justify-content: center; }
+            .logo-text { display: none; }
+            .logo-area { justify-content: center; }
+            .user-pill { padding: 0; justify-content: center; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="auth-overlay">
-        <div class="auth-card">
-            <div class="logo">0</div>
-            <h2 id="auth-msg">Sign in to Zero</h2>
-            <div id="signup-extra" class="hidden">
-                <input type="text" id="user-name" placeholder="Full Name (REHAN RS / ZERO)">
+    <div id="auth-gate" class="modal-overlay">
+        <div class="modal-card" style="width: 450px; text-align: center;">
+            <div class="auth-logo"><i class="fa-solid fa-bolt" style="color:var(--accent)"></i></div>
+            <h1 style="margin-bottom: 30px; font-size: 1.9rem;">Sign in to Zero</h1>
+            
+            <div id="signup-fields" class="hidden">
+                <input type="text" id="reg-name" class="auth-input" placeholder="Name (e.g. REHAN RS)">
             </div>
-            <input type="email" id="user-email" placeholder="Email">
-            <input type="password" id="user-pass" placeholder="Password (Min 6 chars)">
-            <button class="btn-main-post" style="width:100%" onclick="handleAuth()">Continue</button>
-            <p style="color:var(--dim); margin-top:20px; cursor:pointer" onclick="toggleAuth()">New? <span style="color:white">Create Account</span></p>
-            <p id="error-msg" style="color:red; margin-top:10px"></p>
+            <input type="email" id="auth-email" class="auth-input" placeholder="Email">
+            <input type="password" id="auth-pass" class="auth-input" placeholder="Password (Min 6 chars)">
+            
+            <button class="auth-btn" id="auth-action-btn" onclick="executeAuth()">Sign In</button>
+            
+            <p style="color: var(--text-secondary); margin-top: 10px;">
+                <span id="auth-toggle-text">Don't have an account?</span> 
+                <span style="color: var(--accent); cursor: pointer;" onclick="toggleAuthMode()">Sign up</span>
+            </p>
+            <div id="auth-error" style="color: #f4212e; margin-top: 15px; font-size: 0.9rem;"></div>
         </div>
     </div>
 
-    <div id="app" class="container hidden">
-        <nav>
-            <div class="logo">0</div>
-            <div class="nav-link"><i class="fa-solid fa-house"></i> Home</div>
-            <div class="nav-link"><i class="fa-solid fa-bell"></i> Notifications</div>
-            <div class="nav-link"><i class="fa-solid fa-user"></i> Profile</div>
-            <button class="btn-main-post" onclick="logout()">Logout</button>
-        </nav>
+    <div id="app-root" class="app-shell hidden">
+        
+        <header class="sidebar-left">
+            <div>
+                <div class="logo-area">
+                    <i class="fa-solid fa-bolt" style="font-size: 2rem; color: var(--accent); margin-left: 12px;"></i>
+                    <span class="logo-text">ZERO</span>
+                </div>
+                <nav class="nav-menu">
+                    <div class="nav-item active"><i class="fa-solid fa-house"></i> <span>Home</span></div>
+                    <div class="nav-item"><i class="fa-solid fa-magnifying-glass"></i> <span>Explore</span></div>
+                    <div class="nav-item"><i class="fa-regular fa-bell"></i> <span>Notifications</span></div>
+                    <div class="nav-item"><i class="fa-regular fa-envelope"></i> <span>Messages</span></div>
+                    <div class="nav-item"><i class="fa-regular fa-bookmark"></i> <span>Bookmarks</span></div>
+                    <div class="nav-item"><i class="fa-brands fa-twitter"></i> <span>Premium</span></div>
+                    <div class="nav-item"><i class="fa-regular fa-user"></i> <span>Profile</span></div>
+                    <div class="nav-item"><i class="fa-solid fa-ellipsis"></i> <span>More</span></div>
+                    <button class="btn-pulse-large">Pulse</button>
+                </nav>
+            </div>
+            
+            <div class="user-pill" onclick="logout()">
+                <img id="nav-avatar" src="" class="pill-avatar">
+                <div class="pill-info">
+                    <div class="pill-name" id="nav-name">User</div>
+                    <div class="pill-handle" id="nav-handle">@user</div>
+                </div>
+                <i class="fa-solid fa-ellipsis pill-dots" style="margin-left: auto;"></i>
+            </div>
+        </header>
 
-        <main>
-            <div class="header">Home</div>
-            <div class="composer">
-                <img id="my-avatar" class="avatar">
-                <div style="flex:1">
-                    <textarea id="post-text" placeholder="What's the pulse, Bharat?"></textarea>
-                    <button class="post-btn-sm" onclick="sendPost()">Pulse</button>
+        <main class="main-feed">
+            <div class="feed-header">
+                <div class="header-title"><h2>Home</h2></div>
+                <div class="feed-tabs">
+                    <div class="tab-item active">
+                        <span>For you</span>
+                        <div class="tab-indicator"></div>
+                    </div>
+                    <div class="tab-item">
+                        <span>Following</span>
+                    </div>
                 </div>
             </div>
-            <div id="feed"></div>
+
+            <div class="composer">
+                <div class="composer-avatar"><img id="comp-avatar" src=""></div>
+                <div class="composer-body">
+                    <textarea id="pulse-input" class="composer-input" placeholder="What is happening?!"></textarea>
+                    <div class="composer-tools">
+                        <div class="tool-icons">
+                            <div class="tool-icon"><i class="fa-regular fa-image"></i></div>
+                            <div class="tool-icon"><i class="fa-solid fa-gift"></i></div>
+                            <div class="tool-icon"><i class="fa-solid fa-list-ul"></i></div>
+                            <div class="tool-icon"><i class="fa-regular fa-face-smile"></i></div>
+                            <div class="tool-icon"><i class="fa-regular fa-calendar"></i></div>
+                        </div>
+                        <button id="pulse-btn" class="btn-pulse-sm" onclick="sendPulse()">Pulse</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feed-container">
+                </div>
         </main>
 
-        <div class="right-bar">
-            <div class="widget">
-                <h3>What's happening</h3>
-                <p style="margin-top:10px; color:var(--dim)">#ZeroLaunch</p>
-                <p style="color:var(--dim)">#RehanRS</p>
+        <aside class="sidebar-right">
+            <div class="search-container">
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass" style="color: var(--text-secondary)"></i>
+                    <input type="text" placeholder="Search Zero">
+                </div>
+            </div>
+
+            <div class="widget-box">
+                <div class="widget-header">Trends for you</div>
+                <div class="trend-item">
+                    <div class="trend-meta"><span>Politics · Trending</span><i class="fa-solid fa-ellipsis"></i></div>
+                    <div class="trend-title">#Election2026</div>
+                    <div class="trend-meta">125K posts</div>
+                </div>
+                <div class="trend-item">
+                    <div class="trend-meta"><span>Sports · Trending</span><i class="fa-solid fa-ellipsis"></i></div>
+                    <div class="trend-title">Virat Kohli</div>
+                    <div class="trend-meta">58.2K posts</div>
+                </div>
+                <div class="trend-item">
+                    <div class="trend-meta"><span>Technology · Trending</span><i class="fa-solid fa-ellipsis"></i></div>
+                    <div class="trend-title">Zero App Launch</div>
+                    <div class="trend-meta">1.5M posts</div>
+                </div>
+            </div>
+
+            <div class="widget-box">
+                <div class="widget-header">Who to follow</div>
+                <div id="suggestions-box">
+                    </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <div id="comment-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="close-modal" onclick="closeCommentModal()"><i class="fa-solid fa-xmark"></i></div>
+            <div id="comment-target-post" style="margin-top: 30px; border-bottom: 1px solid var(--border); padding-bottom: 15px;">
+                </div>
+            <div class="composer" style="border: none; padding: 15px 0;">
+                <div class="composer-avatar"><img id="comment-my-avatar" class="post-avatar" src=""></div>
+                <div class="composer-body">
+                    <textarea id="comment-input" class="composer-input" placeholder="Post your reply"></textarea>
+                    <div class="composer-tools">
+                        <div class="tool-icons">
+                            <div class="tool-icon"><i class="fa-regular fa-image"></i></div>
+                        </div>
+                        <button class="btn-pulse-sm active" onclick="submitComment()">Reply</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        const SB_URL = 'https://tsuiaealzqkkwmlwrdyn.supabase.co';
-        const SB_KEY = 'sb_publishable_5WCnkOmfRZ4W3sTNDwtlpQ_pmIZi90g';
-        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+        // --- CONFIGURATION ---
+        const SUPABASE_URL = 'https://tsuiaealzqkkwmlwrdyn.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_5WCnkOmfRZ4W3sTNDwtlpQ_pmIZi90g';
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let myProfile = null;
-        let signup = false;
+        // --- STATE ---
+        let currentUser = null;
+        let isSignup = false;
+        let activePostId = null; // For commenting
 
-        function toggleAuth() {
-            signup = !signup;
-            document.getElementById('signup-extra').classList.toggle('hidden');
-            document.getElementById('auth-msg').innerText = signup ? "Create Account" : "Sign in to Zero";
+        // --- AUTH SYSTEM ---
+        function toggleAuthMode() {
+            isSignup = !isSignup;
+            document.getElementById('signup-fields').classList.toggle('hidden');
+            document.getElementById('auth-action-btn').innerText = isSignup ? "Sign up" : "Sign in";
+            document.getElementById('auth-toggle-text').innerText = isSignup ? "Have an account?" : "Don't have an account?";
         }
 
-        async function handleAuth() {
-            const email = document.getElementById('user-email').value;
-            const pass = document.getElementById('user-pass').value;
-            const name = document.getElementById('user-name').value;
-            const err = document.getElementById('error-msg');
+        async function executeAuth() {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-pass').value;
+            const errBox = document.getElementById('auth-error');
+            errBox.innerText = "";
 
-            if (signup) {
-                if (pass.length < 6) return err.innerText = "Password too short!";
-                const { data, error } = await supabaseClient.auth.signUp({ email, password: pass });
-                if (error) return err.innerText = error.message;
+            try {
+                if (isSignup) {
+                    const name = document.getElementById('reg-name').value;
+                    if (pass.length < 6) throw new Error("Password must be at least 6 characters");
+                    
+                    const { data, error } = await sb.auth.signUp({ email, password: pass });
+                    if (error) throw error;
 
-                // Create profile with Auto-Verify logic
-                let handle = "@" + name.toLowerCase().replace(/\s/g, '');
-                let isVerified = (name.toUpperCase() === "REHAN RS" || name.toUpperCase() === "ZERO");
-                
-                await supabaseClient.from('profiles').insert([{
-                    id: data.user.id, username: name, handle: handle,
-                    is_verified: isVerified, avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`
-                }]);
-                alert("Account created! Login now."); location.reload();
-            } else {
-                const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-                if (error) return err.innerText = error.message;
-                init();
+                    // SPECIAL ACCOUNTS LOGIC
+                    let handle = "@" + name.toLowerCase().replace(/\s/g, '');
+                    let verified = false;
+                    let bio = "Zero User";
+                    
+                    if (name.toUpperCase() === "REHAN RS") { verified = true; bio = "Founder of Zero"; handle = "@rehan_rs"; }
+                    if (name.toUpperCase() === "ZERO") { verified = true; bio = "Official Account"; handle = "@zero_hq"; }
+
+                    await sb.from('profiles').insert([{
+                        id: data.user.id,
+                        username: name,
+                        handle: handle,
+                        is_verified: verified,
+                        bio: bio,
+                        avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`
+                    }]);
+                    alert("Account Created! Please Sign In.");
+                    location.reload();
+                } else {
+                    const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+                    if (error) throw error;
+                    initializeApp();
+                }
+            } catch (e) {
+                errBox.innerText = e.message;
             }
         }
 
-        async function init() {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) return;
-
-            const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
-            if (!profile) return logout();
-
-            myProfile = profile;
-            document.getElementById('auth-overlay').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
-            document.getElementById('my-avatar').src = profile.avatar_url;
-            loadPosts();
+        async function logout() {
+            await sb.auth.signOut();
+            location.reload();
         }
 
-        async function loadPosts() {
-            const { data: posts } = await supabaseClient.from('posts').select(`id, content, profiles(username, handle, avatar_url, is_verified)`).order('created_at', { ascending: false });
-            const { data: myLikes } = await supabaseClient.from('likes').select('post_id').eq('user_id', myProfile.id);
-            const likedSet = new Set(myLikes.map(l => l.post_id));
+        // --- APP INITIALIZATION ---
+        async function initializeApp() {
+            const { data: { user } } = await sb.auth.getUser();
+            if (!user) return; // Stay on auth screen
 
-            document.getElementById('feed').innerHTML = posts.map(p => `
-                <div class="post">
-                    <img src="${p.profiles.avatar_url}" class="avatar">
-                    <div style="flex:1">
-                        <div class="post-user">${p.profiles.username} ${p.profiles.is_verified ? '<i class="fa-solid fa-circle-check verify"></i>' : ''} <span class="post-handle">${p.profiles.handle}</span></div>
-                        <div class="post-content">${p.content}</div>
+            // Fetch Profile
+            let { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+            
+            // Auto-Heal Missing Profile
+            if (!profile) {
+                await sb.from('profiles').insert([{
+                    id: user.id, username: "User", handle: "@user"+user.id.slice(0,4),
+                    avatar_url: `https://api.dicebear.com/7.x/bottts/svg?seed=${user.id}`
+                }]);
+                return initializeApp();
+            }
+
+            currentUser = profile;
+            
+            // Update UI
+            document.getElementById('auth-gate').classList.add('hidden');
+            document.getElementById('app-root').classList.remove('hidden');
+            
+            // Set User Data in Nav & Composer
+            const avatars = document.querySelectorAll('#nav-avatar, #comp-avatar, #comment-my-avatar');
+            avatars.forEach(img => img.src = profile.avatar_url);
+            document.getElementById('nav-name').innerText = profile.username;
+            document.getElementById('nav-handle').innerText = profile.handle;
+
+            loadFeed();
+            loadSuggestions();
+        }
+
+        // --- FEED LOGIC ---
+        async function loadFeed() {
+            // Get Posts + Join Profiles
+            const { data: posts } = await sb
+                .from('posts')
+                .select(`*, profiles(*)`)
+                .order('created_at', { ascending: false });
+
+            // Get My Likes
+            const { data: likes } = await sb.from('likes').select('post_id').eq('user_id', currentUser.id);
+            const likedSet = new Set(likes.map(l => l.post_id));
+
+            const container = document.getElementById('feed-container');
+            container.innerHTML = posts.map(post => createPostHTML(post, likedSet.has(post.id))).join('');
+        }
+
+        function createPostHTML(post, isLiked) {
+            const timeAgo = new Date(post.created_at).toLocaleDateString();
+            return `
+                <div class="post" onclick="openPostDetails(${post.id})">
+                    <img src="${post.profiles.avatar_url}" class="post-avatar">
+                    <div class="post-content-area">
+                        <div class="post-meta">
+                            <span class="post-name">${post.profiles.username}</span>
+                            ${post.profiles.is_verified ? '<i class="fa-solid fa-circle-check verified-badge"></i>' : ''}
+                            <span class="post-handle">${post.profiles.handle}</span>
+                            <span class="post-time">· ${timeAgo}</span>
+                        </div>
+                        <div class="post-text">${post.content}</div>
                         <div class="post-actions">
-                            <i class="fa-regular fa-comment"></i>
-                            <i class="fa-solid fa-retweet"></i>
-                            <i class="${likedSet.has(p.id) ? 'fa-solid liked' : 'fa-regular'} fa-heart" onclick="toggleLike(${p.id}, this)"></i>
-                            <i class="fa-solid fa-share-nodes"></i>
+                            <div class="action-group reply" onclick="event.stopPropagation(); openCommentModal('${post.id}', '${post.content.replace(/'/g, "\\'")}', '${post.profiles.username}')">
+                                <div class="action-icon-box"><i class="fa-regular fa-comment"></i></div>
+                                <span>${post.comments_count || 0}</span>
+                            </div>
+                            <div class="action-group repost" onclick="event.stopPropagation()">
+                                <div class="action-icon-box"><i class="fa-solid fa-retweet"></i></div>
+                                <span>${post.reposts_count || 0}</span>
+                            </div>
+                            <div class="action-group like ${isLiked ? 'liked' : ''}" onclick="event.stopPropagation(); toggleLike(${post.id}, this)">
+                                <div class="action-icon-box"><i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i></div>
+                                <span>${post.likes_count || 0}</span>
+                            </div>
+                            <div class="action-group share" onclick="event.stopPropagation()">
+                                <div class="action-icon-box"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
+                            </div>
                         </div>
                     </div>
+                </div>
+            `;
+        }
+
+        // --- INTERACTION LOGIC ---
+        
+        // 1. Posting
+        const pulseInput = document.getElementById('pulse-input');
+        const pulseBtn = document.getElementById('pulse-btn');
+        
+        pulseInput.addEventListener('input', () => {
+            if (pulseInput.value.trim().length > 0) {
+                pulseBtn.classList.add('active');
+            } else {
+                pulseBtn.classList.remove('active');
+            }
+        });
+
+        async function sendPulse() {
+            const content = pulseInput.value;
+            if (!content) return;
+            
+            await sb.from('posts').insert([{ user_id: currentUser.id, content: content }]);
+            pulseInput.value = '';
+            pulseBtn.classList.remove('active');
+            loadFeed();
+        }
+
+        // 2. Liking
+        async function toggleLike(postId, element) {
+            const isLiked = element.classList.contains('liked');
+            const icon = element.querySelector('i');
+            const countSpan = element.querySelector('span');
+            let count = parseInt(countSpan.innerText);
+
+            // Optimistic UI Update
+            if (isLiked) {
+                element.classList.remove('liked');
+                icon.classList.replace('fa-solid', 'fa-regular');
+                countSpan.innerText = count - 1;
+                await sb.from('likes').delete().match({ user_id: currentUser.id, post_id: postId });
+                await sb.rpc('decrement_likes', { post_id: postId }); // Assuming RPC or trigger handles count
+            } else {
+                element.classList.add('liked');
+                icon.classList.replace('fa-regular', 'fa-solid');
+                countSpan.innerText = count + 1;
+                await sb.from('likes').insert([{ user_id: currentUser.id, post_id: postId }]);
+                // Note: For production, use DB triggers to update counts. 
+                // For this single file demo, counts update on reload.
+            }
+        }
+
+        // 3. Commenting
+        function openCommentModal(postId, content, username) {
+            activePostId = postId;
+            document.getElementById('comment-target-post').innerHTML = `
+                <div style="display:flex; gap:12px; opacity:0.7;">
+                   <div style="width:40px"></div> 
+                   <div>
+                        <span style="font-weight:700">${username}</span> <br>
+                        ${content}
+                   </div>
+                </div>
+            `;
+            document.getElementById('comment-modal').classList.remove('hidden');
+        }
+
+        function closeCommentModal() {
+            document.getElementById('comment-modal').classList.add('hidden');
+        }
+
+        async function submitComment() {
+            const text = document.getElementById('comment-input').value;
+            if(!text) return;
+
+            await sb.from('comments').insert([{
+                post_id: activePostId,
+                user_id: currentUser.id,
+                content: text
+            }]);
+            
+            document.getElementById('comment-input').value = '';
+            closeCommentModal();
+            alert("Reply sent!");
+        }
+
+        // 4. Suggestions
+        async function loadSuggestions() {
+            const { data: users } = await sb.from('profiles').select('*').neq('id', currentUser.id).limit(3);
+            const container = document.getElementById('suggestions-box');
+            
+            container.innerHTML = users.map(u => `
+                <div class="trend-item" style="display:flex; gap:10px; align-items:center;">
+                    <img src="${u.avatar_url}" style="width:40px; height:40px; border-radius:50%">
+                    <div style="flex:1">
+                        <div style="font-weight:700; font-size:0.9rem">${u.username} ${u.is_verified ? '✔️' : ''}</div>
+                        <div style="color:var(--text-secondary); font-size:0.85rem">${u.handle}</div>
+                    </div>
+                    <button style="background:white; color:black; padding:6px 16px; border-radius:20px; font-weight:700; font-size:0.85rem">Follow</button>
                 </div>
             `).join('');
         }
 
-        async function sendPost() {
-            const text = document.getElementById('post-text').value;
-            if(!text) return;
-            await supabaseClient.from('posts').insert([{ user_id: myProfile.id, content: text }]);
-            document.getElementById('post-text').value = '';
-            loadPosts();
-        }
+        // --- START ---
+        initializeApp();
 
-        async function toggleLike(postId, el) {
-            if (el.classList.contains('liked')) {
-                await supabaseClient.from('likes').delete().eq('post_id', postId).eq('user_id', myProfile.id);
-                el.classList.replace('fa-solid', 'fa-regular'); el.classList.remove('liked');
-            } else {
-                await supabaseClient.from('likes').insert([{ post_id: postId, user_id: myProfile.id }]);
-                el.classList.replace('fa-regular', 'fa-solid'); el.classList.add('liked');
-            }
-        }
-
-        async function logout() { await supabaseClient.auth.signOut(); location.reload(); }
-        init();
     </script>
 </body>
 </html>

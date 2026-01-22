@@ -3,59 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>ZERO | The Pulse of Bharat</title>
+    <title>ZERO | Professional Social Architecture</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --bg: #000000; --surface: #0a0a0a; --surface-bright: #16181c;
             --border: #2f3336; --accent: #ff5722; --text: #eff3f4;
             --dim: #71767b; --verify: #1d9bf0; --heart: #f91880;
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); overflow-x: hidden; scroll-behavior: smooth; }
         .hidden { display: none !important; }
-        button { cursor: pointer; transition: 0.2s; border: none; }
         
-        /* Layout Grid */
+        /* --- APP GRID LAYOUT --- */
         .app-shell {
             display: grid; grid-template-columns: 275px 600px 1fr;
             max-width: 1250px; margin: 0 auto; min-height: 100vh;
         }
 
-        /* Nav Sidebar */
+        /* --- NAVIGATION --- */
         nav { padding: 10px 15px; border-right: 1px solid var(--border); position: sticky; top:0; height: 100vh; display: flex; flex-direction: column; }
-        .logo { font-size: 3rem; font-weight: 900; color: var(--accent); margin: 10px 0 20px 10px; cursor: pointer; }
-        .nav-link { padding: 12px 20px; border-radius: 50px; font-size: 1.25rem; display: flex; align-items: center; gap: 20px; margin-bottom: 5px; cursor: pointer; }
-        .nav-link:hover { background: var(--surface-bright); }
-        .nav-link.active { font-weight: 900; }
+        .logo { font-size: 3rem; font-weight: 900; color: var(--accent); margin-bottom: 25px; cursor: pointer; padding-left: 10px; }
+        .nav-item { 
+            padding: 12px 20px; border-radius: 50px; font-size: 1.25rem; 
+            display: flex; align-items: center; gap: 20px; margin-bottom: 5px; 
+            cursor: pointer; transition: 0.2s; color: var(--text); text-decoration: none;
+        }
+        .nav-item:hover { background: var(--surface-bright); }
+        .nav-item.active { font-weight: 900; }
+        .btn-pulse-xl { background: var(--accent); color: white; padding: 16px; border-radius: 50px; font-weight: 800; width: 90%; margin-top: 20px; font-size: 1.1rem; }
 
-        /* Main Feed */
-        main { border-right: 1px solid var(--border); min-height: 100vh; }
-        .header { padding: 15px 20px; font-size: 1.3rem; font-weight: 800; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+        /* --- CONTENT AREA --- */
+        main { border-right: 1px solid var(--border); min-height: 100vh; position: relative; }
+        .sticky-header {
+            position: sticky; top: 0; padding: 15px 20px; font-size: 1.3rem; font-weight: 800;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); z-index: 100;
+        }
         
+        /* --- FEED COMPONENTS --- */
         .composer { padding: 20px; border-bottom: 1px solid var(--border); display: flex; gap: 15px; }
-        .avatar { width: 48px; height: 48px; border-radius: 50%; background: #222; object-fit: cover; }
-        textarea { width: 100%; font-size: 1.3rem; color: white; border: none; background: none; outline: none; resize: none; margin-top: 10px; min-height: 80px; }
+        .avatar { width: 48px; height: 48px; border-radius: 50%; background: #222; object-fit: cover; cursor: pointer; }
+        .avatar-lg { width: 120px; height: 120px; border: 4px solid #000; border-radius: 50%; }
         
-        .pulse-card { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; transition: 0.1s; }
+        textarea { width: 100%; font-size: 1.3rem; color: white; border: none; background: none; outline: none; resize: none; min-height: 80px; margin-top: 10px; }
+        
+        .pulse-card { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; transition: 0.1s; animation: fadeIn 0.4s ease; }
         .pulse-card:hover { background: rgba(255,255,255,0.02); }
-        .action-bar { display: flex; justify-content: space-between; max-width: 425px; margin-top: 12px; color: var(--dim); }
-        .action-btn { display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; }
-        .action-btn:hover { color: var(--accent); }
+        .card-body { flex: 1; }
+        .user-meta { display: flex; align-items: center; gap: 5px; font-weight: 700; cursor: pointer; }
+        .handle-meta { color: var(--dim); font-weight: 400; }
+        
+        .action-group { display: flex; justify-content: space-between; max-width: 425px; margin-top: 12px; color: var(--dim); }
+        .action-item { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
+        .action-item:hover { color: var(--accent); }
         .liked { color: var(--heart) !important; }
 
-        /* Auth Gate */
+        /* --- PROFILE VIEW --- */
+        .prof-banner { height: 200px; background: #1c1c1c; position: relative; }
+        .prof-details { padding: 20px; padding-top: 60px; position: relative; border-bottom: 1px solid var(--border); }
+        .follow-btn { position: absolute; top: 20px; right: 20px; padding: 10px 25px; border-radius: 50px; font-weight: 700; background: white; color: black; }
+
+        /* --- AUTH GATE --- */
         #auth-gate { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .auth-card { width: 400px; padding: 40px; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; text-align: center; }
-        .social-btn { width: 100%; padding: 14px; margin: 8px 0; border-radius: 50px; display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: 700; background: white; color: black; }
-        .insta-btn { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; }
-        .input-box { width: 100%; padding: 15px; margin: 8px 0; background: #000; border: 1px solid var(--border); color: white; border-radius: 10px; }
+        .auth-card { width: 420px; padding: 50px; background: var(--surface); border: 1px solid var(--border); border-radius: 32px; text-align: center; }
+        .social-btn { width: 100%; padding: 14px; margin: 8px 0; border-radius: 50px; display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: 700; background: white; color: black; border: 1px solid #ccc; }
+        .btn-insta { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; border: none; }
         
-        .btn-pulse { background: var(--accent); color: white; padding: 12px 24px; border-radius: 50px; font-weight: 800; width: 100%; margin-top: 10px; }
-        
-        @media (max-width: 1000px) { .app-shell { grid-template-columns: 80px 1fr 0; } .nav-text { display: none; } }
+        input { width: 100%; padding: 16px; margin: 10px 0; background: #000; border: 1px solid var(--border); color: white; border-radius: 12px; font-size: 1rem; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 1000px) {
+            .app-shell { grid-template-columns: 80px 1fr 0; }
+            .nav-text, .btn-pulse-xl, aside { display: none; }
+            nav { align-items: center; }
+        }
     </style>
 </head>
 <body>
@@ -63,203 +90,241 @@
     <div id="auth-gate">
         <div class="auth-card">
             <div class="logo">0</div>
-            <h2 style="margin-bottom: 20px;">Join the Pulse</h2>
-            <button class="social-btn" onclick="auth.social('google')"><img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="18"> Google</button>
-            <button class="social-btn insta-btn" onclick="auth.social('instagram')"><i class="fa-brands fa-instagram"></i> Instagram</button>
-            <div style="margin: 15px 0; color: var(--dim);">OR</div>
-            <input type="email" id="email" class="input-box" placeholder="Email">
-            <input type="password" id="pass" class="input-box" placeholder="Password">
-            <button class="btn-pulse" onclick="auth.login()">Sign In / Up</button>
+            <h1 style="margin-bottom: 30px;">Pulse of Bharat</h1>
+            
+            <button class="social-btn" onclick="auth.social('google')">
+                <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20"> Continue with Google
+            </button>
+            <button class="social-btn btn-insta" onclick="auth.social('instagram')">
+                <i class="fa-brands fa-instagram"></i> Continue with Instagram
+            </button>
+
+            <div style="margin: 20px 0; color: var(--dim);">OR</div>
+            
+            <input type="email" id="auth-email" placeholder="Email Address">
+            <input type="password" id="auth-pass" placeholder="Password">
+            <button class="btn-pulse-xl" style="width: 100%;" onclick="auth.login()">Enter Zero</button>
         </div>
     </div>
 
-    <div id="app" class="app-shell hidden">
+    <div id="app-root" class="app-shell hidden">
+        
         <nav>
-            <div class="logo">0</div>
-            <div class="nav-link active" onclick="ui.view('home', this)"><i class="fa-solid fa-house"></i> <span class="nav-text">Home</span></div>
-            <div class="nav-link" onclick="ui.view('search', this)"><i class="fa-solid fa-magnifying-glass"></i> <span class="nav-text">Search</span></div>
-            <div class="nav-link" onclick="engine.openProfile()"><i class="fa-solid fa-user"></i> <span class="nav-text">Profile</span></div>
-            <button class="btn-pulse" style="margin-top: 20px;" onclick="document.getElementById('p-input').focus()">Pulse</button>
-            
-            <div style="margin-top: auto; padding: 20px; cursor: pointer;" onclick="auth.logout()">
-                <img id="nav-ava" class="avatar" style="width:40px; height:40px">
-                <span class="nav-text" id="nav-u-name" style="margin-left:10px; font-weight:700">User</span>
+            <div class="logo" onclick="router.go('home')">0</div>
+            <div class="nav-item active" onclick="router.go('home', this)"><i class="fa-solid fa-house"></i> <span class="nav-text">Home</span></div>
+            <div class="nav-item" onclick="router.go('explore', this)"><i class="fa-solid fa-magnifying-glass"></i> <span class="nav-text">Explore</span></div>
+            <div class="nav-item" onclick="router.go('profile', this)"><i class="fa-solid fa-user"></i> <span class="nav-text">Profile</span></div>
+            <button class="btn-pulse-xl" onclick="ui.focusComposer()">Pulse</button>
+
+            <div style="margin-top: auto; padding: 20px 10px; cursor: pointer;" onclick="auth.logout()">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <img id="nav-user-ava" class="avatar" style="width: 40px; height: 40px;">
+                    <div class="nav-text">
+                        <div id="nav-user-name" style="font-weight: 800; font-size: 0.9rem;">User</div>
+                        <div style="color: var(--dim); font-size: 0.8rem;">Logout</div>
+                    </div>
+                </div>
             </div>
         </nav>
 
         <main>
-            <section id="v-home">
-                <div class="header">Home</div>
+            <section id="view-home">
+                <div class="sticky-header">Home</div>
                 <div class="composer">
-                    <img id="comp-ava" class="avatar">
-                    <div style="flex:1">
-                        <textarea id="p-input" placeholder="What's happening?"></textarea>
-                        <div style="text-align: right;"><button class="btn-pulse" style="width:auto" onclick="engine.post()">Pulse</button></div>
+                    <img id="comp-user-ava" class="avatar">
+                    <div style="flex: 1;">
+                        <textarea id="p-text" placeholder="What's the pulse?"></textarea>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 15px;">
+                            <div style="color: var(--accent); font-size: 1.2rem; display: flex; gap: 20px;">
+                                <i class="fa-regular fa-image"></i><i class="fa-solid fa-chart-bar"></i><i class="fa-regular fa-face-smile"></i>
+                            </div>
+                            <button class="btn-pulse-xl" style="width: auto; margin: 0; padding: 8px 25px;" onclick="engine.createPulse()">Pulse</button>
+                        </div>
                     </div>
                 </div>
-                <div id="feed"></div>
+                <div id="home-feed"></div>
             </section>
 
-            <section id="v-search" class="hidden">
-                <div class="header">Explore</div>
-                <div style="padding:20px">
-                    <input type="text" class="input-box" placeholder="Search Bharat..." oninput="engine.search(this.value)">
+            <section id="view-explore" class="hidden">
+                <div class="sticky-header">Explore</div>
+                <div style="padding: 20px;">
+                    <input type="text" placeholder="Search people..." style="border-radius: 50px;" oninput="engine.searchUsers(this.value)">
                     <div id="search-results"></div>
                 </div>
             </section>
 
-            <section id="v-profile" class="hidden">
-                <div class="header" id="prof-title">Profile</div>
-                <div style="height:150px; background:#111"></div>
-                <div style="padding:20px; position:relative">
-                    <img id="p-ava" class="avatar" style="width:100px; height:100px; border:4px solid #000; margin-top:-60px">
-                    <div id="follow-btn-container" style="position:absolute; top:20px; right:20px"></div>
-                    <h2 id="p-name" style="margin-top:10px">Name</h2>
-                    <p id="p-handle" style="color:var(--dim)">@handle</p>
+            <section id="view-profile" class="hidden">
+                <div class="sticky-header" id="prof-header-title">Profile</div>
+                <div class="prof-banner">
+                    <img id="prof-ava-img" class="avatar-lg" style="position: absolute; bottom: -60px; left: 20px;">
                 </div>
-                <div id="user-feed"></div>
+                <div class="prof-details">
+                    <div id="prof-action-area"></div>
+                    <h2 id="prof-display-name" style="font-size: 1.5rem; font-weight: 900;">User Name</h2>
+                    <p id="prof-handle" style="color: var(--dim);">@handle</p>
+                    <div style="margin-top: 15px; display: flex; gap: 20px; color: var(--dim);">
+                        <span><b style="color: white;">0</b> Following</span>
+                        <span><b style="color: white;">0</b> Followers</span>
+                    </div>
+                </div>
+                <div id="profile-feed"></div>
             </section>
         </main>
 
-        <aside style="padding:20px" class="nav-text">
-            <div style="background:var(--surface-bright); padding:20px; border-radius:20px">
-                <h3>Trends</h3>
-                <p style="margin-top:15px; color:var(--dim)">#ZeroBharat</p>
-                <p style="color:var(--dim)">#DigitalPulse</p>
+        <aside style="padding: 20px;">
+            <div style="background: var(--surface-bright); border-radius: 20px; padding: 20px;">
+                <h3 style="margin-bottom: 15px;">What's happening</h3>
+                <div style="margin-bottom: 15px;">
+                    <p style="font-size: 0.8rem; color: var(--dim);">Technology · Trending</p>
+                    <p style="font-weight: 800;">#ZeroLaunch</p>
+                    <p style="font-size: 0.8rem; color: var(--dim);">42.5K Pulses</p>
+                </div>
+                <div>
+                    <p style="font-size: 0.8rem; color: var(--dim);">Politics · Trending</p>
+                    <p style="font-weight: 800;">#DigitalBharat</p>
+                    <p style="font-size: 0.8rem; color: var(--dim);">12.1K Pulses</p>
+                </div>
             </div>
         </aside>
+
     </div>
 
     <script>
+        // --- DATA LAYER ---
         const SB_URL = 'https://tsuiaealzqkkwmlwrdyn.supabase.co';
         const SB_KEY = 'sb_publishable_5WCnkOmfRZ4W3sTNDwtlpQ_pmIZi90g';
         const sb = supabase.createClient(SB_URL, SB_KEY);
 
-        let userState = null;
+        let currentUser = null;
 
+        // --- AUTH ENGINE ---
         const auth = {
             async social(p) { await sb.auth.signInWithOAuth({ provider: p }); },
             async login() {
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('pass').value;
-                const { data, error } = await sb.auth.signInWithPassword({ email, password });
+                const email = document.getElementById('auth-email').value;
+                const password = document.getElementById('auth-pass').value;
+                const { error } = await sb.auth.signInWithPassword({ email, password });
                 if(error) {
-                    const { error: signUpError } = await sb.auth.signUp({ email, password });
-                    if(signUpError) alert(signUpError.message); else alert("Verify your email!");
-                } else { init(); }
+                    const { error: signUpErr } = await sb.auth.signUp({ email, password });
+                    if(signUpErr) alert(signUpErr.message); else alert("Verification email sent!");
+                } else { initApp(); }
             },
             logout() { sb.auth.signOut(); location.reload(); }
         };
 
-        const ui = {
-            view(id, el) {
-                document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
-                document.getElementById('v-' + id).classList.remove('hidden');
+        // --- ROUTING ENGINE ---
+        const router = {
+            go(viewId, el) {
+                document.querySelectorAll('main section').forEach(v => v.classList.add('hidden'));
+                document.getElementById('view-' + viewId).classList.remove('hidden');
                 if(el) {
-                    document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+                    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
                     el.classList.add('active');
                 }
+                if(viewId === 'home') engine.loadFeed();
+                if(viewId === 'profile') engine.loadProfile(currentUser.id);
             }
         };
 
+        // --- CORE LOGIC ENGINE ---
         const engine = {
             async loadFeed() {
-                // PGRST201 FIX: Use profiles!user_id explicitly
-                const { data: posts } = await sb.from('posts').select('*, profiles!user_id(*)').order('created_at', {ascending: false});
-                const { data: likes } = await sb.from('likes').select('post_id').eq('user_id', userState.id);
+                // FIXED PGRST201: Explicit join using profiles!user_id
+                const { data: pulses } = await sb.from('posts').select('*, profiles!user_id(*)').order('created_at', {ascending: false});
+                const { data: likes } = await sb.from('likes').select('post_id').eq('user_id', currentUser.id);
                 const likedSet = new Set((likes || []).map(l => l.post_id));
                 
-                document.getElementById('feed').innerHTML = (posts || []).map(p => this.card(p, likedSet.has(p.id))).join('');
+                document.getElementById('home-feed').innerHTML = (pulses || []).map(p => this.renderCard(p, likedSet.has(p.id))).join('');
             },
 
-            card(p, isLiked) {
-                const u = p.profiles || { username: 'Anonymous', handle: '@user', avatar_url: '' };
+            renderCard(p, isLiked) {
+                const u = p.profiles || { username: 'Unknown', handle: '@user', avatar_url: '' };
                 return `
                 <div class="pulse-card">
-                    <img src="${u.avatar_url}" class="avatar" onclick="engine.openProfile('${u.id}')" style="cursor:pointer">
-                    <div style="flex:1">
-                        <div onclick="engine.openProfile('${u.id}')" style="cursor:pointer">
-                            <b>${u.username}</b> <span style="color:var(--dim)">${u.handle}</span>
+                    <img src="${u.avatar_url}" class="avatar" onclick="engine.loadProfile('${u.id}')">
+                    <div class="card-body">
+                        <div class="user-meta" onclick="engine.loadProfile('${u.id}')">
+                            ${u.username} ${u.is_verified ? '<i class="fa-solid fa-circle-check" style="color:var(--verify)"></i>' : ''}
+                            <span class="handle-meta">${u.handle}</span>
                         </div>
-                        <div style="margin-top:5px">${p.content}</div>
-                        <div class="action-bar">
-                            <div class="action-btn" onclick="engine.like(${p.id}, this)">
+                        <div style="margin-top: 5px;">${p.content}</div>
+                        <div class="action-group">
+                            <div class="action-item" onclick="engine.toggleLike(${p.id}, this)">
                                 <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart ${isLiked ? 'liked' : ''}"></i> ${p.likes_count || 0}
                             </div>
-                            <div class="action-btn"><i class="fa-solid fa-retweet"></i></div>
-                            <div class="action-btn"><i class="fa-solid fa-share"></i></div>
+                            <div class="action-item"><i class="fa-solid fa-retweet"></i> ${p.reposts_count || 0}</div>
+                            <div class="action-item"><i class="fa-solid fa-share-nodes"></i></div>
                         </div>
                     </div>
                 </div>`;
             },
 
-            async post() {
-                const content = document.getElementById('p-input').value;
+            async createPulse() {
+                const content = document.getElementById('p-text').value;
                 if(!content) return;
-                await sb.from('posts').insert([{ user_id: userState.id, content }]);
-                document.getElementById('p-input').value = '';
+                await sb.from('posts').insert([{ user_id: currentUser.id, content }]);
+                document.getElementById('p-text').value = '';
                 this.loadFeed();
             },
 
-            async like(id, el) {
-                const icon = el.querySelector('i');
-                if(icon.classList.contains('fa-solid')) {
-                    await sb.from('likes').delete().eq('post_id', id).eq('user_id', userState.id);
+            async toggleLike(pid, el) {
+                const isLiked = el.querySelector('i').classList.contains('fa-solid');
+                if(isLiked) {
+                    await sb.from('likes').delete().eq('post_id', pid).eq('user_id', currentUser.id);
                 } else {
-                    await sb.from('likes').insert([{ post_id: id, user_id: userState.id }]);
+                    await sb.from('likes').insert([{ post_id: pid, user_id: currentUser.id }]);
                 }
                 this.loadFeed();
             },
 
-            async openProfile(uid) {
-                const id = uid || userState.id;
-                ui.view('profile');
-                const { data: p } = await sb.from('profiles').select('*').eq('id', id).single();
-                document.getElementById('p-name').innerText = p.username;
-                document.getElementById('p-handle').innerText = p.handle;
-                document.getElementById('p-ava').src = p.avatar_url;
-                
-                // Set follow button
-                const btnBox = document.getElementById('follow-btn-container');
-                if(id !== userState.id) {
-                    btnBox.innerHTML = `<button class="btn-pulse" style="width:auto" onclick="engine.follow('${id}')">Follow</button>`;
-                } else { btnBox.innerHTML = ''; }
+            async loadProfile(uid) {
+                router.go('profile');
+                const { data: p } = await sb.from('profiles').select('*').eq('id', uid).single();
+                document.getElementById('prof-header-title').innerText = p.username;
+                document.getElementById('prof-display-name').innerText = p.username;
+                document.getElementById('prof-handle').innerText = p.handle;
+                document.getElementById('prof-ava-img').src = p.avatar_url;
 
-                const { data: posts } = await sb.from('posts').select('*, profiles!user_id(*)').eq('user_id', id);
-                document.getElementById('user-feed').innerHTML = (posts || []).map(p => this.card(p, false)).join('');
+                const area = document.getElementById('prof-action-area');
+                area.innerHTML = (uid !== currentUser.id) ? `<button class="follow-btn" onclick="engine.follow('${uid}')">Follow</button>` : '';
+
+                const { data: userPulses } = await sb.from('posts').select('*, profiles!user_id(*)').eq('user_id', uid);
+                document.getElementById('profile-feed').innerHTML = (userPulses || []).map(p => this.renderCard(p, false)).join('');
             },
 
-            async follow(targetId) {
-                await sb.from('follows').insert([{ follower_id: userState.id, following_id: targetId }]);
-                alert("Following!");
-            },
-
-            async search(q) {
+            async searchUsers(q) {
                 if(q.length < 2) return;
-                const { data: users } = await sb.from('profiles').select('*').ilike('username', `%${q}%`);
-                document.getElementById('search-results').innerHTML = (users || []).map(u => `
-                    <div class="pulse-card" onclick="engine.openProfile('${u.id}')" style="cursor:pointer">
+                const { data } = await sb.from('profiles').select('*').ilike('username', `%${q}%`);
+                document.getElementById('search-results').innerHTML = (data || []).map(u => `
+                    <div class="pulse-card" onclick="engine.loadProfile('${u.id}')">
                         <img src="${u.avatar_url}" class="avatar">
                         <div><b>${u.username}</b><br><span style="color:var(--dim)">${u.handle}</span></div>
                     </div>`).join('');
             }
         };
 
-        async function init() {
+        // --- UI UTILS ---
+        const ui = {
+            focusComposer() { router.go('home'); document.getElementById('p-text').focus(); }
+        };
+
+        // --- BOOTSTRAP ---
+        async function initApp() {
             const { data: { user } } = await sb.auth.getUser();
             if(!user) return;
             const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
             if(!profile) return;
-            userState = profile;
+
+            currentUser = profile;
             document.getElementById('auth-gate').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
-            document.getElementById('nav-ava').src = profile.avatar_url;
-            document.getElementById('comp-ava').src = profile.avatar_url;
-            document.getElementById('nav-u-name').innerText = profile.username;
+            document.getElementById('app-root').classList.remove('hidden');
+            document.getElementById('nav-user-ava').src = profile.avatar_url;
+            document.getElementById('comp-user-ava').src = profile.avatar_url;
+            document.getElementById('nav-user-name').innerText = profile.username;
             engine.loadFeed();
         }
 
-        init();
+        initApp();
     </script>
 </body>
 </html>

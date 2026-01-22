@@ -7,7 +7,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -17,38 +17,27 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); overflow: hidden; }
         .hidden { display: none !important; }
+
+        /* Auth Screen */
+        #auth-gate { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .auth-card { width: 400px; padding: 40px; background: var(--surface); border: 1px solid var(--border); border-radius: 32px; text-align: center; }
+        input { width: 100%; padding: 16px; margin: 10px 0; background: #000; border: 1px solid var(--border); color: white; border-radius: 12px; }
+        .btn-prime { background: var(--accent); color: white; padding: 14px; border-radius: 50px; border: none; width: 100%; font-weight: 800; cursor: pointer; }
+        .btn-social { background: #fff; color: #000; padding: 12px; border-radius: 50px; width: 100%; margin-top: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+
+        /* Layout Grid */
+        .app-shell { display: grid; grid-template-columns: 275px 600px 1fr; max-width: 1250px; margin: 0 auto; height: 100vh; }
+        nav { padding: 10px 15px; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        main { border-right: 1px solid var(--border); overflow-y: scroll; scrollbar-width: none; }
         
-        /* Layout */
-        .app-shell { display: grid; grid-template-columns: 275px 600px 1fr; max-width: 1250px; margin: 0 auto; min-height: 100vh; }
-        nav { padding: 10px 15px; border-right: 1px solid var(--border); position: sticky; top:0; height: 100vh; display: flex; flex-direction: column; }
-        main { border-right: 1px solid var(--border); min-height: 100vh; }
-        
-        /* UI Components */
-        .logo { font-size: 3rem; font-weight: 900; color: var(--accent); margin-bottom: 20px; cursor: pointer; }
-        .nav-link { padding: 14px 20px; border-radius: 50px; font-size: 1.25rem; display: flex; align-items: center; gap: 20px; cursor: pointer; transition: 0.2s; }
-        .nav-link:hover { background: var(--surface-2); }
-        .nav-link.active { font-weight: 900; }
-        
-        .header { padding: 15px 20px; font-size: 1.3rem; font-weight: 800; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); position: sticky; top:0; z-index: 100; }
-        
-        /* Auth Gate - Professional UI */
-        #auth-gate { position: fixed; inset:0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .auth-card { width: 400px; padding: 40px; background: var(--surface); border: 1px solid var(--border); border-radius: 28px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .input-group { margin-bottom: 15px; text-align: left; }
-        input { width: 100%; padding: 16px; background: #000; border: 1px solid var(--border); color: white; border-radius: 12px; font-size: 1rem; outline: none; transition: 0.2s; }
-        input:focus { border-color: var(--accent); }
-        
-        .btn-main { background: var(--accent); color: white; padding: 14px; border-radius: 50px; font-weight: 800; border: none; width: 100%; cursor: pointer; font-size: 1rem; }
-        .btn-social { background: #fff; color: #000; padding: 12px; border-radius: 50px; border: none; width: 100%; margin-top: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
-        
-        /* Feed */
-        .pulse-card { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; transition: 0.1s; }
+        /* Pulse UI */
+        .header { padding: 15px 20px; font-size: 1.3rem; font-weight: 800; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 10; }
+        .pulse-card { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; cursor: pointer; }
         .pulse-card:hover { background: rgba(255,255,255,0.02); }
-        .avatar { width: 48px; height: 48px; border-radius: 50%; background: #222; object-fit: cover; }
-        .action-icon { color: var(--dim); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
-        .action-icon:hover { color: var(--accent); }
+        .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; background: #222; }
+        .action-bar { display: flex; justify-content: space-between; max-width: 400px; margin-top: 10px; color: var(--dim); }
         .liked { color: var(--heart) !important; }
 
         @media (max-width: 1000px) { .app-shell { grid-template-columns: 80px 1fr 0; } .nav-text, aside { display: none; } }
@@ -58,45 +47,26 @@
 
     <div id="auth-gate">
         <div class="auth-card">
-            <div class="logo">0</div>
-            <h2 style="margin-bottom: 10px;">The Future is Zero.</h2>
-            <p style="color: var(--dim); margin-bottom: 25px;">Sign in to join the pulse.</p>
-            
-            <div class="input-group">
-                <input type="email" id="auth-email" placeholder="Email Address">
-            </div>
-            <div class="input-group">
-                <input type="password" id="auth-password" placeholder="Password">
-            </div>
-            
-            <button class="btn-main" onclick="Core.auth.handleAuth()" id="auth-submit">Continue</button>
-            
-            <div style="margin: 20px 0; color: var(--dim); font-size: 0.8rem;">OR</div>
-            
-            <button class="btn-social" onclick="Core.auth.social('google')">
+            <div style="font-size: 3rem; font-weight: 900; color: var(--accent); margin-bottom: 10px;">0</div>
+            <h2 style="margin-bottom: 20px;">The Pulse of Bharat</h2>
+            <input type="email" id="email" placeholder="Email Address">
+            <input type="password" id="pass" placeholder="Password">
+            <button class="btn-prime" onclick="Zero.auth.unified()" id="auth-btn">Continue</button>
+            <div style="margin: 20px 0; color: var(--dim);">OR</div>
+            <button class="btn-social" onclick="Zero.auth.social('google')">
                 <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="18"> Google
-            </button>
-            <button class="btn-social" style="background: #e1306c; color: white;" onclick="Core.auth.social('instagram')">
-                <i class="fa-brands fa-instagram"></i> Instagram
             </button>
         </div>
     </div>
 
     <div id="app" class="app-shell hidden">
         <nav>
-            <div class="logo" style="font-size: 2.5rem; margin-left: 10px;">0</div>
-            <div class="nav-link active" onclick="Core.ui.view('home', this)"><i class="fa-solid fa-house"></i> <span class="nav-text">Home</span></div>
-            <div class="nav-link" onclick="Core.ui.view('explore', this)"><i class="fa-solid fa-magnifying-glass"></i> <span class="nav-text">Explore</span></div>
-            <div class="nav-link" onclick="Core.engine.loadProfile()"><i class="fa-solid fa-user"></i> <span class="nav-text">Profile</span></div>
-            
-            <div style="margin-top: auto; padding: 20px; cursor: pointer; border-top: 1px solid var(--border);" onclick="Core.auth.signOut()">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <img id="nav-avatar" class="avatar" style="width: 38px; height: 38px;">
-                    <div class="nav-text">
-                        <div id="nav-user" style="font-weight: 800; font-size: 0.9rem;">User</div>
-                        <div style="color: var(--dim); font-size: 0.8rem;">Sign Out</div>
-                    </div>
-                </div>
+            <div style="font-size: 2.5rem; font-weight: 900; color: var(--accent); padding: 20px;">0</div>
+            <div style="padding: 15px; font-size: 1.2rem; cursor: pointer;" onclick="Zero.ui.view('home')"><i class="fa-solid fa-house"></i> <span class="nav-text" style="margin-left: 15px;">Home</span></div>
+            <div style="padding: 15px; font-size: 1.2rem; cursor: pointer;" onclick="Zero.engine.openProfile()"><i class="fa-solid fa-user"></i> <span class="nav-text" style="margin-left: 15px;">Profile</span></div>
+            <div style="margin-top: auto; padding: 20px; border-top: 1px solid var(--border); cursor: pointer;" onclick="Zero.auth.out()">
+                <img id="my-ava" class="avatar" style="width: 40px; height: 40px; vertical-align: middle;">
+                <span class="nav-text" id="my-name" style="margin-left: 10px; font-weight: 700;">User</span>
             </div>
         </nav>
 
@@ -104,31 +74,21 @@
             <section id="v-home">
                 <div class="header">Home</div>
                 <div style="padding: 20px; border-bottom: 1px solid var(--border); display: flex; gap: 15px;">
-                    <img id="comp-avatar" class="avatar">
-                    <div style="flex:1">
-                        <textarea id="pulse-input" placeholder="What's the pulse, Bharat?" style="width: 100%; background: none; border: none; color: white; font-size: 1.2rem; resize: none; outline: none;"></textarea>
-                        <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
-                            <button class="btn-main" style="width: auto; padding: 8px 20px;" onclick="Core.engine.createPulse()">Pulse</button>
-                        </div>
+                    <img id="comp-ava" class="avatar">
+                    <div style="flex: 1;">
+                        <textarea id="pulse-box" placeholder="What's happening?" style="width: 100%; background: none; border: none; color: white; font-size: 1.2rem; outline: none; resize: none;"></textarea>
+                        <div style="text-align: right;"><button class="btn-prime" style="width: auto; padding: 8px 25px;" onclick="Zero.engine.post()">Pulse</button></div>
                     </div>
                 </div>
-                <div id="main-feed"></div>
-            </section>
-
-            <section id="v-explore" class="hidden">
-                <div class="header">Explore</div>
-                <div style="padding: 20px;">
-                    <input type="text" placeholder="Search Bharat..." style="border-radius: 50px; padding: 12px 25px;" oninput="Core.engine.search(this.value)">
-                    <div id="search-results" style="margin-top: 20px;"></div>
-                </div>
+                <div id="feed-root"></div>
             </section>
 
             <section id="v-profile" class="hidden">
-                <div class="header" id="p-header-name">Profile</div>
-                <div style="height: 180px; background: #16181c;"></div>
+                <div class="header" id="prof-header">Profile</div>
+                <div style="height: 150px; background: var(--surface-2);"></div>
                 <div style="padding: 20px; position: relative;">
-                    <img id="p-avatar-lg" class="avatar" style="width: 120px; height: 120px; border: 4px solid #000; margin-top: -70px;">
-                    <h2 id="p-display-name" style="margin-top: 15px;">Name</h2>
+                    <img id="p-ava-lg" class="avatar" style="width: 100px; height: 100px; border: 4px solid #000; margin-top: -60px;">
+                    <h2 id="p-name" style="margin-top: 10px;">Name</h2>
                     <p id="p-handle" style="color: var(--dim);">@handle</p>
                 </div>
                 <div id="p-feed"></div>
@@ -136,10 +96,9 @@
         </main>
 
         <aside style="padding: 20px;">
-            <div style="background: var(--surface-2); border-radius: 20px; padding: 20px;">
-                <h3 style="margin-bottom: 15px;">Trending Pulse</h3>
-                <p style="font-weight: 800; margin-bottom: 5px;">#DigitalBharat</p>
-                <p style="color: var(--dim); font-size: 0.8rem;">12.4K Pulses</p>
+            <div style="background: var(--surface-2); padding: 20px; border-radius: 20px;">
+                <h3>Trending Bharat</h3>
+                <p style="margin-top: 15px; font-weight: 800;">#ZeroMillion</p>
             </div>
         </aside>
     </div>
@@ -149,125 +108,126 @@
         const SB_KEY = 'sb_publishable_5WCnkOmfRZ4W3sTNDwtlpQ_pmIZi90g';
         const sb = supabase.createClient(SB_URL, SB_KEY);
 
-        const Core = {
-            state: { user: null, profile: null },
+        const Zero = {
+            user: null,
+
+            // THE BRAIN: Monitors Auth State
+            init() {
+                sb.auth.onAuthStateChange(async (event, session) => {
+                    if (session) {
+                        this.user = session.user;
+                        await this.syncProfile();
+                    } else {
+                        document.getElementById('auth-gate').classList.remove('hidden');
+                        document.getElementById('app').classList.add('hidden');
+                    }
+                });
+            },
+
+            async syncProfile() {
+                let profile = null;
+                // Retry Logic: Gives the SQL Trigger time to create the profile row
+                for (let i = 0; i < 5; i++) {
+                    const { data } = await sb.from('profiles').select('*').eq('id', this.user.id).maybeSingle();
+                    if (data) { profile = data; break; }
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+
+                if (profile) {
+                    this.user.profile = profile;
+                    document.getElementById('auth-gate').classList.add('hidden');
+                    document.getElementById('app').classList.remove('hidden');
+                    document.getElementById('my-ava').src = profile.avatar_url;
+                    document.getElementById('comp-ava').src = profile.avatar_url;
+                    document.getElementById('my-name').innerText = profile.username;
+                    this.engine.load();
+                }
+            },
 
             auth: {
-                async handleAuth() {
-                    const email = document.getElementById('auth-email').value;
-                    const password = document.getElementById('auth-password').value;
-                    const btn = document.getElementById('auth-submit');
-                    
+                async unified() {
+                    const email = document.getElementById('email').value;
+                    const pass = document.getElementById('pass').value;
+                    const btn = document.getElementById('auth-btn');
                     btn.disabled = true; btn.innerText = "Processing...";
 
-                    // Atomic Auth: Try login, if fails, try signup
-                    const { data, error } = await sb.auth.signInWithPassword({ email, password });
-                    
-                    if (error) {
-                        const { error: sError } = await sb.auth.signUp({ email, password });
-                        if(sError) alert(sError.message);
-                        else alert("Verification sent or Auto-logging in...");
+                    const { error: loginErr } = await sb.auth.signInWithPassword({ email, password: pass });
+                    if (loginErr) {
+                        const { error: upErr } = await sb.auth.signUp({ email, password: pass });
+                        if (upErr) alert(upErr.message);
                     }
-                    
                     btn.disabled = false; btn.innerText = "Continue";
-                    Core.init();
                 },
-
                 async social(p) { await sb.auth.signInWithOAuth({ provider: p }); },
-                async signOut() { await sb.auth.signOut(); location.reload(); }
+                out() { sb.auth.signOut(); location.reload(); }
             },
 
             engine: {
-                async loadFeed() {
-                    const { data: pulses, error } = await sb.from('posts').select('*, profiles!user_id(*)').order('created_at', {ascending: false});
-                    if(error) return console.error("Feed Load Failed:", error);
-
-                    const root = document.getElementById('main-feed');
-                    root.innerHTML = pulses.map(p => this.template(p)).join('');
+                async load() {
+                    // Explicit Join Fix
+                    const { data: posts } = await sb.from('posts').select('*, profiles!user_id(*)').order('created_at', {ascending: false});
+                    const { data: likes } = await sb.from('likes').select('post_id').eq('user_id', Zero.user.id);
+                    const LSet = new Set((likes || []).map(l => l.post_id));
+                    
+                    document.getElementById('feed-root').innerHTML = (posts || []).map(p => this.card(p, LSet.has(p.id))).join('');
                 },
 
-                template(p) {
-                    const u = p.profiles || { username: 'Anonymous', handle: '@user', avatar_url: '' };
+                card(p, isLiked) {
+                    const u = p.profiles || { username: 'User', handle: '@user', avatar_url: '' };
                     return `
                     <div class="pulse-card">
-                        <img src="${u.avatar_url}" class="avatar" onclick="Core.engine.loadProfile('${u.id}')">
+                        <img src="${u.avatar_url}" class="avatar" onclick="Zero.engine.openProfile('${u.id}')">
                         <div style="flex:1">
-                            <div style="font-weight:800; cursor:pointer" onclick="Core.engine.loadProfile('${u.id}')">
-                                ${u.username} <span style="color:var(--dim); font-weight:400; margin-left:5px;">${u.handle}</span>
-                            </div>
-                            <div style="margin-top:5px; line-height:1.5">${p.content}</div>
-                            <div style="display:flex; justify-content:space-between; margin-top:12px; max-width:400px;">
-                                <div class="action-icon"><i class="fa-regular fa-comment"></i> 0</div>
-                                <div class="action-icon"><i class="fa-solid fa-retweet"></i> 0</div>
-                                <div class="action-icon" onclick="Core.engine.like(${p.id})"><i class="fa-regular fa-heart"></i> ${p.likes_count || 0}</div>
+                            <div onclick="Zero.engine.openProfile('${u.id}')"><b>${u.username}</b> <span style="color:var(--dim)">${u.handle}</span></div>
+                            <div style="margin-top:5px;">${p.content}</div>
+                            <div class="action-bar">
+                                <span class="${isLiked ? 'liked' : ''}" onclick="Zero.engine.like(${p.id}, this)">
+                                    <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i> ${p.likes_count || 0}
+                                </span>
+                                <span><i class="fa-solid fa-retweet"></i></span>
                             </div>
                         </div>
                     </div>`;
                 },
 
-                async createPulse() {
-                    const content = document.getElementById('pulse-input').value;
+                async post() {
+                    const content = document.getElementById('pulse-box').value;
                     if(!content) return;
-                    const { error } = await sb.from('posts').insert([{ user_id: Core.state.user.id, content }]);
-                    if(!error) { document.getElementById('pulse-input').value = ''; this.loadFeed(); }
+                    await sb.from('posts').insert([{ user_id: Zero.user.id, content }]);
+                    document.getElementById('pulse-box').value = '';
+                    this.load();
                 },
 
-                async loadProfile(uid) {
-                    const targetId = uid || Core.state.user.id;
-                    Core.ui.view('profile');
-                    
-                    const { data: prof } = await sb.from('profiles').select('*').eq('id', targetId).single();
-                    document.getElementById('p-header-name').innerText = prof.username;
-                    document.getElementById('p-display-name').innerText = prof.username;
-                    document.getElementById('p-handle').innerText = prof.handle;
-                    document.getElementById('p-avatar-lg').src = prof.avatar_url;
+                async like(pid, el) {
+                    const liked = el.classList.contains('liked');
+                    if(liked) await sb.from('likes').delete().eq('post_id', pid).eq('user_id', Zero.user.id);
+                    else await sb.from('likes').insert([{ post_id: pid, user_id: Zero.user.id }]);
+                    this.load();
+                },
 
-                    const { data: posts } = await sb.from('posts').select('*, profiles!user_id(*)').eq('user_id', targetId);
-                    document.getElementById('p-feed').innerHTML = (posts || []).map(p => this.template(p)).join('');
+                async openProfile(uid) {
+                    const id = uid || Zero.user.id;
+                    Zero.ui.view('profile');
+                    const { data: p } = await sb.from('profiles').select('*').eq('id', id).single();
+                    document.getElementById('prof-header').innerText = p.username;
+                    document.getElementById('p-name').innerText = p.username;
+                    document.getElementById('p-handle').innerText = p.handle;
+                    document.getElementById('p-ava-lg').src = p.avatar_url;
+
+                    const { data: pulses } = await sb.from('posts').select('*, profiles!user_id(*)').eq('user_id', id);
+                    document.getElementById('p-feed').innerHTML = (pulses || []).map(pulse => this.card(pulse, false)).join('');
                 }
             },
 
             ui: {
-                view(id, el) {
+                view(id) {
                     document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
                     document.getElementById('v-' + id).classList.remove('hidden');
-                    if(el) {
-                        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-                        el.classList.add('active');
-                    }
                 }
-            },
-
-            async init() {
-                const { data: { user } } = await sb.auth.getUser();
-                if(!user) return;
-
-                // Professional Retry Logic for Profile Sync
-                let profile = null;
-                for(let i=0; i<3; i++) {
-                    const { data } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
-                    if(data) { profile = data; break; }
-                    await new Promise(r => setTimeout(r, 1000));
-                }
-
-                if(!profile) return;
-
-                Core.state.user = user;
-                Core.state.profile = profile;
-
-                document.getElementById('auth-gate').classList.add('hidden');
-                document.getElementById('app').classList.remove('hidden');
-                
-                document.getElementById('nav-avatar').src = profile.avatar_url;
-                document.getElementById('comp-avatar').src = profile.avatar_url;
-                document.getElementById('nav-user').innerText = profile.username;
-
-                Core.engine.loadFeed();
             }
         };
 
-        // Initialize session on load
-        Core.init();
+        Zero.init();
     </script>
 </body>
 </html>

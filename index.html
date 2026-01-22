@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>ZERO | The Pulse of Bharat</title>
+    <title>ZERO | Digital Social Engine</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -22,23 +22,24 @@
 
         /* Auth Screen */
         #auth-gate { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .auth-card { width: 400px; padding: 40px; background: var(--surface); border: 1px solid var(--border); border-radius: 32px; text-align: center; }
-        input { width: 100%; padding: 16px; margin: 10px 0; background: #000; border: 1px solid var(--border); color: white; border-radius: 12px; }
-        .btn-prime { background: var(--accent); color: white; padding: 14px; border-radius: 50px; border: none; width: 100%; font-weight: 800; cursor: pointer; }
-        .btn-social { background: #fff; color: #000; padding: 12px; border-radius: 50px; width: 100%; margin-top: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
+        .auth-card { width: 90%; max-width: 400px; padding: 40px; background: var(--surface); border: 1px solid var(--border); border-radius: 32px; text-align: center; }
+        input { width: 100%; padding: 16px; margin: 10px 0; background: #000; border: 1px solid var(--border); color: white; border-radius: 12px; outline: none; transition: 0.2s; }
+        input:focus { border-color: var(--accent); }
+        .btn-prime { background: var(--accent); color: white; padding: 14px; border-radius: 50px; border: none; width: 100%; font-weight: 800; cursor: pointer; font-size: 1rem; }
+        .btn-prime:disabled { opacity: 0.5; }
 
-        /* Layout Grid */
+        /* App Layout */
         .app-shell { display: grid; grid-template-columns: 275px 600px 1fr; max-width: 1250px; margin: 0 auto; height: 100vh; }
         nav { padding: 10px 15px; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        main { border-right: 1px solid var(--border); overflow-y: scroll; scrollbar-width: none; }
+        main { border-right: 1px solid var(--border); overflow-y: scroll; scrollbar-width: none; background: #000; }
         
-        /* Pulse UI */
+        /* Components */
         .header { padding: 15px 20px; font-size: 1.3rem; font-weight: 800; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 10; }
-        .pulse-card { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; cursor: pointer; }
-        .pulse-card:hover { background: rgba(255,255,255,0.02); }
-        .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; background: #222; }
-        .action-bar { display: flex; justify-content: space-between; max-width: 400px; margin-top: 10px; color: var(--dim); }
-        .liked { color: var(--heart) !important; }
+        .pulse-card { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; }
+        .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; background: #222; flex-shrink: 0; cursor: pointer; }
+        .nav-item { padding: 14px 20px; border-radius: 50px; font-size: 1.25rem; display: flex; align-items: center; gap: 20px; cursor: pointer; transition: 0.2s; margin-bottom: 5px; }
+        .nav-item:hover { background: var(--surface-2); }
+        .nav-item.active { font-weight: 900; }
 
         @media (max-width: 1000px) { .app-shell { grid-template-columns: 80px 1fr 0; } .nav-text, aside { display: none; } }
     </style>
@@ -47,26 +48,32 @@
 
     <div id="auth-gate">
         <div class="auth-card">
-            <div style="font-size: 3rem; font-weight: 900; color: var(--accent); margin-bottom: 10px;">0</div>
-            <h2 style="margin-bottom: 20px;">The Pulse of Bharat</h2>
+            <div style="font-size: 3.5rem; font-weight: 900; color: var(--accent); margin-bottom: 5px;">0</div>
+            <h2 style="margin-bottom: 25px;">Enter the Pulse</h2>
+            
             <input type="email" id="email" placeholder="Email Address">
             <input type="password" id="pass" placeholder="Password">
-            <button class="btn-prime" onclick="Zero.auth.unified()" id="auth-btn">Continue</button>
-            <div style="margin: 20px 0; color: var(--dim);">OR</div>
-            <button class="btn-social" onclick="Zero.auth.social('google')">
-                <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="18"> Google
-            </button>
+            
+            <button class="btn-prime" onclick="App.auth.unified()" id="auth-btn">Continue</button>
+            
+            <p id="auth-msg" style="margin-top: 15px; font-size: 0.8rem; color: var(--dim);"></p>
         </div>
     </div>
 
-    <div id="app" class="app-shell hidden">
+    <div id="platform" class="app-shell hidden">
         <nav>
             <div style="font-size: 2.5rem; font-weight: 900; color: var(--accent); padding: 20px;">0</div>
-            <div style="padding: 15px; font-size: 1.2rem; cursor: pointer;" onclick="Zero.ui.view('home')"><i class="fa-solid fa-house"></i> <span class="nav-text" style="margin-left: 15px;">Home</span></div>
-            <div style="padding: 15px; font-size: 1.2rem; cursor: pointer;" onclick="Zero.engine.openProfile()"><i class="fa-solid fa-user"></i> <span class="nav-text" style="margin-left: 15px;">Profile</span></div>
-            <div style="margin-top: auto; padding: 20px; border-top: 1px solid var(--border); cursor: pointer;" onclick="Zero.auth.out()">
-                <img id="my-ava" class="avatar" style="width: 40px; height: 40px; vertical-align: middle;">
-                <span class="nav-text" id="my-name" style="margin-left: 10px; font-weight: 700;">User</span>
+            <div class="nav-item active" onclick="App.ui.view('home', this)"><i class="fa-solid fa-house"></i> <span class="nav-text">Home</span></div>
+            <div class="nav-item" onclick="App.engine.openProfile()"><i class="fa-solid fa-user"></i> <span class="nav-text">Profile</span></div>
+            
+            <div style="margin-top: auto; padding: 20px; border-top: 1px solid var(--border); cursor: pointer;" onclick="App.auth.logout()">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img id="nav-ava" class="avatar" style="width: 35px; height: 35px;">
+                    <div class="nav-text">
+                        <div id="nav-user" style="font-weight: 700; font-size: 0.9rem;">User</div>
+                        <div style="color: var(--dim); font-size: 0.7rem;">Sign Out</div>
+                    </div>
+                </div>
             </div>
         </nav>
 
@@ -76,19 +83,21 @@
                 <div style="padding: 20px; border-bottom: 1px solid var(--border); display: flex; gap: 15px;">
                     <img id="comp-ava" class="avatar">
                     <div style="flex: 1;">
-                        <textarea id="pulse-box" placeholder="What's happening?" style="width: 100%; background: none; border: none; color: white; font-size: 1.2rem; outline: none; resize: none;"></textarea>
-                        <div style="text-align: right;"><button class="btn-prime" style="width: auto; padding: 8px 25px;" onclick="Zero.engine.post()">Pulse</button></div>
+                        <textarea id="pulse-input" placeholder="What's happening?" style="width: 100%; background: none; border: none; color: white; font-size: 1.2rem; outline: none; resize: none; min-height: 80px;"></textarea>
+                        <div style="display: flex; justify-content: flex-end; padding-top: 10px; border-top: 1px solid #222;">
+                            <button class="btn-prime" style="width: auto; padding: 8px 25px;" onclick="App.engine.createPulse()">Pulse</button>
+                        </div>
                     </div>
                 </div>
-                <div id="feed-root"></div>
+                <div id="feed"></div>
             </section>
 
             <section id="v-profile" class="hidden">
-                <div class="header" id="prof-header">Profile</div>
-                <div style="height: 150px; background: var(--surface-2);"></div>
+                <div class="header" id="p-header">Profile</div>
+                <div style="height: 160px; background: var(--surface-2);"></div>
                 <div style="padding: 20px; position: relative;">
-                    <img id="p-ava-lg" class="avatar" style="width: 100px; height: 100px; border: 4px solid #000; margin-top: -60px;">
-                    <h2 id="p-name" style="margin-top: 10px;">Name</h2>
+                    <img id="p-ava-lg" class="avatar" style="width: 100px; height: 100px; border: 4px solid #000; margin-top: -65px;">
+                    <h2 id="p-name" style="margin-top: 10px; font-size: 1.5rem;">Username</h2>
                     <p id="p-handle" style="color: var(--dim);">@handle</p>
                 </div>
                 <div id="p-feed"></div>
@@ -97,8 +106,9 @@
 
         <aside style="padding: 20px;">
             <div style="background: var(--surface-2); padding: 20px; border-radius: 20px;">
-                <h3>Trending Bharat</h3>
-                <p style="margin-top: 15px; font-weight: 800;">#ZeroMillion</p>
+                <h3 style="margin-bottom: 10px;">Trends</h3>
+                <p style="color: var(--accent); font-weight: 800;">#ZeroLaunch</p>
+                <p style="color: var(--dim); font-size: 0.8rem;">Million Dollar Tech</p>
             </div>
         </aside>
     </div>
@@ -108,126 +118,146 @@
         const SB_KEY = 'sb_publishable_5WCnkOmfRZ4W3sTNDwtlpQ_pmIZi90g';
         const sb = supabase.createClient(SB_URL, SB_KEY);
 
-        const Zero = {
-            user: null,
+        const App = {
+            session: null,
+            profile: null,
 
-            // THE BRAIN: Monitors Auth State
-            init() {
+            // 1. BOOTSTRAP: This runs on page load
+            async init() {
                 sb.auth.onAuthStateChange(async (event, session) => {
+                    console.log("Auth Event:", event);
                     if (session) {
-                        this.user = session.user;
-                        await this.syncProfile();
+                        this.session = session;
+                        await this.loadProfile(session.user.id);
                     } else {
-                        document.getElementById('auth-gate').classList.remove('hidden');
-                        document.getElementById('app').classList.add('hidden');
+                        this.toggleLayer('auth');
                     }
                 });
             },
 
-            async syncProfile() {
-                let profile = null;
-                // Retry Logic: Gives the SQL Trigger time to create the profile row
-                for (let i = 0; i < 5; i++) {
-                    const { data } = await sb.from('profiles').select('*').eq('id', this.user.id).maybeSingle();
-                    if (data) { profile = data; break; }
-                    await new Promise(r => setTimeout(r, 1000));
+            // 2. PROFILE SYNC: Retries until SQL Trigger finishes
+            async loadProfile(uid) {
+                let data = null;
+                for(let i=0; i<5; i++) {
+                    const { data: prof, error } = await sb.from('profiles').select('*').eq('id', uid).maybeSingle();
+                    if (prof) { data = prof; break; }
+                    console.log("Retrying profile sync...");
+                    await new Promise(res => setTimeout(res, 1500));
                 }
 
-                if (profile) {
-                    this.user.profile = profile;
-                    document.getElementById('auth-gate').classList.add('hidden');
-                    document.getElementById('app').classList.remove('hidden');
-                    document.getElementById('my-ava').src = profile.avatar_url;
-                    document.getElementById('comp-ava').src = profile.avatar_url;
-                    document.getElementById('my-name').innerText = profile.username;
-                    this.engine.load();
+                if (data) {
+                    this.profile = data;
+                    this.toggleLayer('app');
+                    this.syncUI();
+                    this.engine.fetchFeed();
+                } else {
+                    document.getElementById('auth-msg').innerText = "Profile Creation Pending. Please refresh.";
                 }
             },
 
+            // 3. AUTH LOGIC: Unified Fallback
             auth: {
                 async unified() {
                     const email = document.getElementById('email').value;
                     const pass = document.getElementById('pass').value;
                     const btn = document.getElementById('auth-btn');
-                    btn.disabled = true; btn.innerText = "Processing...";
+                    
+                    if(!email || !pass) return alert("Fill all fields");
+                    btn.disabled = true; btn.innerText = "Authenticating...";
 
-                    const { error: loginErr } = await sb.auth.signInWithPassword({ email, password: pass });
-                    if (loginErr) {
-                        const { error: upErr } = await sb.auth.signUp({ email, password: pass });
-                        if (upErr) alert(upErr.message);
+                    // TRY LOGIN
+                    const { error: signInErr } = await sb.auth.signInWithPassword({ email, password: pass });
+                    
+                    if (signInErr) {
+                        // IF LOGIN FAILS, TRY SIGNUP
+                        const { error: signUpErr } = await sb.auth.signUp({ email, password: pass });
+                        if (signUpErr) {
+                            alert("Error: " + signUpErr.message);
+                            btn.disabled = false; btn.innerText = "Continue";
+                        } else {
+                            document.getElementById('auth-msg').innerText = "Redirecting to Platform...";
+                        }
                     }
-                    btn.disabled = false; btn.innerText = "Continue";
                 },
-                async social(p) { await sb.auth.signInWithOAuth({ provider: p }); },
-                out() { sb.auth.signOut(); location.reload(); }
+                logout() { sb.auth.signOut(); location.reload(); }
             },
 
+            // 4. ENGINE: Feed and Data handling
             engine: {
-                async load() {
-                    // Explicit Join Fix
+                async fetchFeed() {
                     const { data: posts } = await sb.from('posts').select('*, profiles!user_id(*)').order('created_at', {ascending: false});
-                    const { data: likes } = await sb.from('likes').select('post_id').eq('user_id', Zero.user.id);
-                    const LSet = new Set((likes || []).map(l => l.post_id));
-                    
-                    document.getElementById('feed-root').innerHTML = (posts || []).map(p => this.card(p, LSet.has(p.id))).join('');
+                    const feed = document.getElementById('feed');
+                    feed.innerHTML = (posts || []).map(p => this.template(p)).join('');
                 },
 
-                card(p, isLiked) {
+                template(p) {
                     const u = p.profiles || { username: 'User', handle: '@user', avatar_url: '' };
                     return `
                     <div class="pulse-card">
-                        <img src="${u.avatar_url}" class="avatar" onclick="Zero.engine.openProfile('${u.id}')">
+                        <img src="${u.avatar_url}" class="avatar" onclick="App.engine.openProfile('${u.id}')">
                         <div style="flex:1">
-                            <div onclick="Zero.engine.openProfile('${u.id}')"><b>${u.username}</b> <span style="color:var(--dim)">${u.handle}</span></div>
-                            <div style="margin-top:5px;">${p.content}</div>
-                            <div class="action-bar">
-                                <span class="${isLiked ? 'liked' : ''}" onclick="Zero.engine.like(${p.id}, this)">
-                                    <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i> ${p.likes_count || 0}
-                                </span>
-                                <span><i class="fa-solid fa-retweet"></i></span>
+                            <div onclick="App.engine.openProfile('${u.id}')"><b>${u.username}</b> <span style="color:var(--dim); font-weight:400">${u.handle}</span></div>
+                            <div style="margin-top:5px; line-height:1.4">${p.content}</div>
+                            <div style="margin-top:10px; color:var(--dim); display:flex; gap:20px;">
+                                <span><i class="fa-regular fa-heart"></i> ${p.likes_count}</span>
+                                <span><i class="fa-solid fa-retweet"></i> 0</span>
                             </div>
                         </div>
                     </div>`;
                 },
 
-                async post() {
-                    const content = document.getElementById('pulse-box').value;
+                async createPulse() {
+                    const content = document.getElementById('pulse-input').value;
                     if(!content) return;
-                    await sb.from('posts').insert([{ user_id: Zero.user.id, content }]);
-                    document.getElementById('pulse-box').value = '';
-                    this.load();
-                },
-
-                async like(pid, el) {
-                    const liked = el.classList.contains('liked');
-                    if(liked) await sb.from('likes').delete().eq('post_id', pid).eq('user_id', Zero.user.id);
-                    else await sb.from('likes').insert([{ post_id: pid, user_id: Zero.user.id }]);
-                    this.load();
+                    await sb.from('posts').insert([{ user_id: App.session.user.id, content }]);
+                    document.getElementById('pulse-input').value = '';
+                    this.fetchFeed();
                 },
 
                 async openProfile(uid) {
-                    const id = uid || Zero.user.id;
-                    Zero.ui.view('profile');
+                    const id = uid || App.session.user.id;
+                    App.ui.view('profile');
                     const { data: p } = await sb.from('profiles').select('*').eq('id', id).single();
-                    document.getElementById('prof-header').innerText = p.username;
+                    document.getElementById('p-header').innerText = p.username;
                     document.getElementById('p-name').innerText = p.username;
                     document.getElementById('p-handle').innerText = p.handle;
                     document.getElementById('p-ava-lg').src = p.avatar_url;
-
+                    
                     const { data: pulses } = await sb.from('posts').select('*, profiles!user_id(*)').eq('user_id', id);
-                    document.getElementById('p-feed').innerHTML = (pulses || []).map(pulse => this.card(pulse, false)).join('');
+                    document.getElementById('p-feed').innerHTML = (pulses || []).map(post => this.template(post)).join('');
                 }
             },
 
+            // 5. UI UTILS
+            toggleLayer(type) {
+                if (type === 'app') {
+                    document.getElementById('auth-gate').classList.add('hidden');
+                    document.getElementById('platform').classList.remove('hidden');
+                } else {
+                    document.getElementById('auth-gate').classList.remove('hidden');
+                    document.getElementById('platform').classList.add('hidden');
+                }
+            },
+
+            syncUI() {
+                document.getElementById('nav-ava').src = this.profile.avatar_url;
+                document.getElementById('comp-ava').src = this.profile.avatar_url;
+                document.getElementById('nav-user').innerText = this.profile.username;
+            },
+
             ui: {
-                view(id) {
+                view(id, el) {
                     document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
                     document.getElementById('v-' + id).classList.remove('hidden');
+                    if(el) {
+                        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                        el.classList.add('active');
+                    }
                 }
             }
         };
 
-        Zero.init();
+        App.init();
     </script>
 </body>
 </html>

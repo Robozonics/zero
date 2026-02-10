@@ -2,175 +2,227 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>ZERO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZERO | The Pulse of Humanity</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/relativeTime.min.js"></script>
 
     <style>
-        /* --- DESIGN SYSTEM --- */
+        /* ========================================
+         1. ZERO DESIGN SYSTEM (ZDS)
+         ========================================
+        */
         :root {
-            --bg: #000000;
-            --surface: #000;
-            --surface-hover: #181818;
-            --border: #2f3336;
-            --accent: #fff; /* X Style Black/White */
-            --primary: #1d9bf0;
-            --text: #e7e9ea;
-            --text-dim: #71767b;
-            --like: #f91880;
-            --repost: #00ba7c;
+            /* Colors */
+            --z-bg: #000000;
+            --z-surface: #0a0a0a;
+            --z-surface-2: #16181c;
+            --z-border: #2f3336;
+            --z-text-main: #eff3f4;
+            --z-text-dim: #71767b;
+            --z-accent: #ffffff;
+            --z-accent-inv: #000000;
+            
+            /* Brands */
+            --z-brand-blue: #1d9bf0;
+            --z-brand-pink: #f91880;
+            --z-brand-green: #00ba7c;
+            
+            /* Spacing & Layout */
+            --nav-w: 275px;
+            --feed-w: 600px;
+            --radius-xl: 30px;
+            --radius-md: 16px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); overflow-y: hidden; height: 100vh; }
+        /* Reset & Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Manrope', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--z-bg); color: var(--z-text-main); height: 100vh; overflow: hidden; }
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; border: none; background: none; color: inherit; transition: all 0.2s cubic-bezier(0.2, 0, 0, 1); }
+        input, textarea { outline: none; background: transparent; border: none; color: white; width: 100%; }
         .hidden { display: none !important; }
-        button { cursor: pointer; transition: 0.2s; border: none; background: none; color: inherit; }
-        input, textarea { background: transparent; border: none; outline: none; color: white; }
-
-        /* --- AUTH LAYER --- */
-        #auth-gate {
-            position: fixed; inset: 0; background: #000; z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .auth-container { width: 100%; max-width: 400px; padding: 40px; text-align: center; }
-        .auth-logo { font-size: 3rem; margin-bottom: 40px; color: var(--text); }
-        .auth-input {
-            width: 100%; padding: 15px; margin-bottom: 15px; background: #000;
-            border: 1px solid var(--border); border-radius: 4px; color: white; font-size: 1rem;
-        }
-        .auth-input:focus { border-color: var(--primary); }
-        .btn-primary {
-            width: 100%; padding: 12px; background: var(--text); color: black;
-            border-radius: 50px; font-weight: 700; font-size: 1rem; margin-top: 10px;
-        }
-        .btn-primary:hover { opacity: 0.9; }
-        .auth-toggle { margin-top: 30px; color: var(--primary); font-size: 0.9rem; cursor: pointer; }
-
-        /* --- APP SHELL --- */
-        .app-shell {
-            display: grid; grid-template-columns: 275px 600px 1fr;
-            max-width: 1300px; margin: 0 auto; height: 100vh;
+        
+        /* Utility: Loading Shimmer */
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        .skeleton { 
+            background: linear-gradient(90deg, #16181c 25%, #202327 50%, #16181c 75%); 
+            background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px;
         }
 
-        /* NAVIGATION */
-        nav { padding: 20px; display: flex; flex-direction: column; border-right: 1px solid var(--border); }
-        .nav-logo { font-size: 2rem; margin-bottom: 30px; padding-left: 10px; }
-        .nav-item {
-            padding: 12px 20px; margin-bottom: 8px; border-radius: 30px;
-            font-size: 1.3rem; display: flex; align-items: center; gap: 20px;
-            transition: 0.2s; cursor: pointer; color: var(--text); text-decoration: none;
+        /* ========================================
+         2. AUTHENTICATION MODULE CSS
+         ========================================
+        */
+        #module-auth {
+            position: fixed; inset: 0; z-index: 9999;
+            background: var(--z-bg); display: grid; place-items: center;
         }
-        .nav-item:hover { background: var(--surface-hover); }
-        .nav-item.active { font-weight: 700; }
-        .btn-pulse {
-            background: var(--primary); color: white; width: 90%; padding: 15px;
-            border-radius: 50px; font-weight: 700; font-size: 1.1rem; margin-top: 20px;
-            box-shadow: 0 4px 10px rgba(29, 155, 240, 0.3);
+        .auth-box {
+            width: 100%; max-width: 400px; padding: 40px;
+        }
+        .auth-header { font-size: 4rem; font-weight: 800; letter-spacing: -3px; margin-bottom: 40px; }
+        .input-field {
+            background: var(--z-bg); border: 1px solid var(--z-border);
+            padding: 16px; border-radius: 8px; font-size: 1rem; margin-bottom: 12px;
+            transition: border-color 0.2s;
+        }
+        .input-field:focus { border-color: var(--z-brand-blue); box-shadow: 0 0 0 1px var(--z-brand-blue); }
+        .btn-big {
+            width: 100%; background: var(--z-text-main); color: var(--z-bg);
+            padding: 14px; border-radius: 50px; font-weight: 700; font-size: 1.1rem; margin-top: 10px;
+        }
+        .btn-big:hover { opacity: 0.9; transform: scale(0.99); }
+        .auth-switch { margin-top: 20px; text-align: center; color: var(--z-brand-blue); cursor: pointer; font-size: 0.9rem; }
+
+        /* ========================================
+         3. MAIN APPLICATION SHELL
+         ========================================
+        */
+        .shell {
+            display: grid; grid-template-columns: var(--nav-w) var(--feed-w) 1fr;
+            max-width: 1300px; margin: 0 auto; height: 100%;
         }
 
-        /* FEED AREA */
-        main { border-right: 1px solid var(--border); overflow-y: auto; scroll-behavior: smooth; }
-        .header {
+        /* Sidebar Nav */
+        nav { padding: 20px 30px 20px 20px; border-right: 1px solid var(--z-border); display: flex; flex-direction: column; justify-content: space-between; }
+        .nav-logo { font-size: 2rem; font-weight: 800; margin-bottom: 30px; padding-left: 10px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 20px; padding: 12px 20px;
+            font-size: 1.3rem; margin-bottom: 8px; border-radius: 30px; color: var(--z-text-main);
+        }
+        .nav-link:hover { background: var(--z-surface-2); }
+        .nav-link.active { font-weight: 800; }
+        .nav-link i { font-size: 1.5rem; width: 30px; }
+        .btn-pulse-nav {
+            background: var(--z-text-main); color: var(--z-bg); width: 90%;
+            padding: 16px; border-radius: 50px; font-weight: 800; font-size: 1.2rem;
+            margin-top: 20px; box-shadow: 0 8px 20px rgba(255,255,255,0.1);
+        }
+
+        /* Main Feed Column */
+        main { border-right: 1px solid var(--z-border); overflow-y: scroll; position: relative; }
+        .header-sticky {
             position: sticky; top: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
-            padding: 15px; border-bottom: 1px solid var(--border); z-index: 10;
+            padding: 15px 20px; border-bottom: 1px solid var(--z-border); z-index: 50;
             font-size: 1.2rem; font-weight: 700; cursor: pointer;
         }
 
-        /* COMPOSER */
-        .composer { padding: 15px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; }
-        .avatar { width: 44px; height: 44px; border-radius: 50%; background: #333; object-fit: cover; }
-        .composer-area { flex: 1; }
-        .composer-input { width: 100%; font-size: 1.25rem; min-height: 50px; resize: none; margin-top: 10px; }
-        .composer-tools { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid #161616; padding-top: 10px; }
-        .tool-icons i { color: var(--primary); margin-right: 15px; cursor: pointer; }
+        /* Composer */
+        .composer { padding: 15px 20px; border-bottom: 1px solid var(--z-border); display: flex; gap: 15px; }
+        .avatar-sm { width: 45px; height: 45px; border-radius: 50%; background: #333; object-fit: cover; }
+        .comp-area { flex: 1; }
+        .comp-input { font-size: 1.25rem; min-height: 60px; resize: none; margin-top: 10px; }
+        .comp-tools { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid var(--z-border); padding-top: 12px; }
+        .tool-icon { color: var(--z-brand-blue); font-size: 1.2rem; margin-right: 15px; cursor: pointer; padding: 8px; border-radius: 50%; }
+        .tool-icon:hover { background: rgba(29, 155, 240, 0.1); }
 
-        /* POST CARD */
-        .post { padding: 15px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; transition: 0.2s; cursor: pointer; }
-        .post:hover { background: rgba(255,255,255,0.02); }
-        .post-header { display: flex; gap: 5px; color: var(--text-dim); font-size: 0.95rem; }
-        .post-header b { color: var(--text); }
-        .post-content { margin-top: 4px; font-size: 1rem; line-height: 1.5; white-space: pre-wrap; }
-        .post-actions { display: flex; justify-content: space-between; margin-top: 12px; max-width: 425px; color: var(--text-dim); }
-        .action { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; group; transition: 0.2s; }
-        .action:hover.like { color: var(--like); }
-        .action:hover.repost { color: var(--repost); }
-        .action.liked { color: var(--like); }
-        .action.reposted { color: var(--repost); }
+        /* Feed Items (Pulse) */
+        .pulse-item {
+            padding: 15px 20px; border-bottom: 1px solid var(--z-border); display: flex; gap: 15px;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .pulse-item:hover { background: rgba(255,255,255,0.03); }
+        .pulse-meta { color: var(--z-text-dim); font-size: 0.95rem; display: flex; gap: 5px; }
+        .pulse-meta b { color: var(--z-text-main); }
+        .pulse-text { margin-top: 5px; font-size: 1rem; line-height: 1.5; white-space: pre-wrap; }
+        .pulse-stats { display: flex; justify-content: space-between; margin-top: 12px; max-width: 400px; color: var(--z-text-dim); }
+        .stat-btn { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; group; padding: 8px; border-radius: 20px; margin-left: -8px; }
+        .stat-btn:hover.like { color: var(--z-brand-pink); background: rgba(249, 24, 128, 0.1); }
+        .stat-btn:hover.repost { color: var(--z-brand-green); background: rgba(0, 186, 124, 0.1); }
+        .stat-btn.liked { color: var(--z-brand-pink); }
+        .stat-btn.reposted { color: var(--z-brand-green); }
 
-        /* PROFILE PAGE */
-        .profile-banner { height: 200px; background-size: cover; background-position: center; }
-        .profile-data { padding: 15px; position: relative; }
-        .profile-avatar-lg { 
-            width: 135px; height: 135px; border-radius: 50%; border: 4px solid black; 
-            position: absolute; top: -70px; left: 15px; object-fit: cover; background: #222;
+        /* Right Sidebar */
+        aside { padding: 20px 30px; }
+        .search-box {
+            background: var(--z-surface-2); padding: 12px 20px; border-radius: 50px;
+            display: flex; gap: 15px; align-items: center; color: var(--z-text-dim);
+            border: 1px solid transparent; transition: 0.2s;
         }
-        .profile-btn { 
-            float: right; border: 1px solid var(--border); padding: 8px 16px; 
-            border-radius: 20px; font-weight: 700; color: white;
-        }
-        .profile-tabs { display: flex; border-bottom: 1px solid var(--border); margin-top: 20px; }
-        .tab { flex: 1; text-align: center; padding: 15px; color: var(--text-dim); cursor: pointer; position: relative; }
-        .tab:hover { background: var(--surface-hover); }
-        .tab.active { color: var(--text); font-weight: 700; }
-        .tab.active::after { 
-            content: ''; position: absolute; bottom: 0; left: 25%; right: 25%; 
-            height: 4px; background: var(--primary); border-radius: 2px;
-        }
+        .search-box:focus-within { background: black; border-color: var(--z-brand-blue); color: var(--z-brand-blue); }
+        .trend-card { background: var(--z-surface-2); border-radius: 16px; padding: 20px; margin-top: 20px; }
 
-        /* MOBILE RESPONSIVENESS */
+        /* Toast Notifications */
+        #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10000; }
+        .toast {
+            background: var(--z-brand-blue); color: white; padding: 12px 24px;
+            border-radius: 50px; margin-top: 10px; font-weight: 600; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* Profile Specifics */
+        .banner { height: 200px; background-size: cover; background-position: center; background-color: #333; }
+        .profile-data { padding: 15px 20px; position: relative; }
+        .profile-pic-lg {
+            width: 140px; height: 140px; border-radius: 50%; border: 4px solid black;
+            position: absolute; top: -70px; left: 20px; background: #000; object-fit: cover;
+        }
+        .btn-edit {
+            float: right; border: 1px solid var(--z-border); padding: 8px 16px;
+            border-radius: 20px; font-weight: 700; transition: 0.2s;
+        }
+        .btn-edit:hover { background: rgba(255,255,255,0.1); }
+        
+        /* Mobile */
         @media (max-width: 1000px) {
-            .app-shell { grid-template-columns: 80px 1fr 0; }
-            .nav-text, aside { display: none; }
-            nav { align-items: center; }
+            .shell { grid-template-columns: 80px 1fr 0; }
+            aside, .nav-text { display: none; }
+            nav { align-items: center; padding: 20px 10px; }
             .nav-logo { margin-bottom: 10px; padding: 0; }
-            .btn-pulse { width: 50px; height: 50px; padding: 0; border-radius: 50%; display: grid; place-items: center; }
-            .btn-pulse span { display: none; }
-            .btn-pulse::after { content: '+'; font-size: 2rem; }
+            .btn-pulse-nav { width: 50px; height: 50px; border-radius: 50%; padding: 0; display: grid; place-items: center; }
+            .btn-pulse-nav span { display: none; }
+            .btn-pulse-nav::after { content: '+'; font-size: 2rem; }
         }
     </style>
 </head>
 <body>
 
-    <div id="auth-gate">
-        <div id="form-login" class="auth-container">
-            <div class="auth-logo"><i class="fa-brands fa-xing"></i></div>
-            <h1 style="margin-bottom: 30px;">Sign in to Zero</h1>
-            <input type="email" id="login-email" class="auth-input" placeholder="Email">
-            <input type="password" id="login-pass" class="auth-input" placeholder="Password">
-            <button class="btn-primary" onclick="Zero.auth.login()">Log in</button>
-            <div class="auth-toggle" onclick="Zero.ui.toggleAuth('signup')">Don't have an account? Sign up</div>
+    <div id="toast-container"></div>
+
+    <div id="module-auth">
+        <div id="view-login" class="auth-box">
+            <div class="auth-header">Zero.</div>
+            <h2 style="margin-bottom: 30px;">Sign in to the Pulse.</h2>
+            <input type="email" id="in-login-email" class="input-field" placeholder="Email address">
+            <input type="password" id="in-login-pass" class="input-field" placeholder="Password">
+            <button class="btn-big" onclick="App.auth.login()">Log in</button>
+            <div class="auth-switch" onclick="App.ui.toggleAuth('signup')">Don't have an account? <b>Sign up</b></div>
         </div>
-        <div id="form-signup" class="auth-container hidden">
-            <div class="auth-logo"><i class="fa-brands fa-xing"></i></div>
-            <h1 style="margin-bottom: 30px;">Create your account</h1>
-            <input type="text" id="reg-name" class="auth-input" placeholder="Full Name">
-            <input type="email" id="reg-email" class="auth-input" placeholder="Email">
-            <input type="password" id="reg-pass" class="auth-input" placeholder="Password">
-            <button class="btn-primary" onclick="Zero.auth.signup()">Sign up</button>
-            <div class="auth-toggle" onclick="Zero.ui.toggleAuth('login')">Have an account? Log in</div>
+        <div id="view-signup" class="auth-box hidden">
+            <div class="auth-header">Zero.</div>
+            <h2 style="margin-bottom: 30px;">Join the network.</h2>
+            <input type="text" id="in-reg-name" class="input-field" placeholder="Full Name">
+            <input type="email" id="in-reg-email" class="input-field" placeholder="Email address">
+            <input type="password" id="in-reg-pass" class="input-field" placeholder="Password">
+            <button class="btn-big" onclick="App.auth.signup()">Sign up</button>
+            <div class="auth-switch" onclick="App.ui.toggleAuth('login')">Have an account? <b>Log in</b></div>
         </div>
     </div>
 
-    <div id="app" class="app-shell hidden">
+    <div id="module-app" class="shell hidden">
         <nav>
-            <div class="nav-logo"><i class="fa-brands fa-xing"></i></div>
-            <div class="nav-item active" onclick="Zero.router.go('home', this)"><i class="fa-solid fa-house"></i> <span class="nav-text">Home</span></div>
-            <div class="nav-item" onclick="Zero.router.go('explore', this)"><i class="fa-solid fa-magnifying-glass"></i> <span class="nav-text">Explore</span></div>
-            <div class="nav-item" onclick="Zero.router.go('profile', this)"><i class="fa-regular fa-user"></i> <span class="nav-text">Profile</span></div>
-            <button class="btn-pulse" onclick="Zero.ui.focusComposer()"><span>Post</span></button>
-            
-            <div style="margin-top: auto; padding: 10px; cursor: pointer;" onclick="Zero.auth.logout()">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <img id="nav-ava" class="avatar">
+            <div>
+                <div class="nav-logo">Zero.</div>
+                <a class="nav-link active" onclick="App.router.go('home')"><i class="fa-solid fa-house"></i> <span class="nav-text">Home</span></a>
+                <a class="nav-link" onclick="App.router.go('explore')"><i class="fa-solid fa-magnifying-glass"></i> <span class="nav-text">Explore</span></a>
+                <a class="nav-link" onclick="App.router.go('notifications')"><i class="fa-regular fa-bell"></i> <span class="nav-text">Notifications</span></a>
+                <a class="nav-link" onclick="App.router.go('profile')"><i class="fa-regular fa-user"></i> <span class="nav-text">Profile</span></a>
+                <button class="btn-pulse-nav" onclick="App.ui.focusComposer()"><span>Pulse</span></button>
+            </div>
+            <div style="cursor: pointer; padding: 10px; border-radius: 50px;" onclick="App.auth.logout()">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <img id="nav-avatar" class="avatar-sm">
                     <div class="nav-text">
-                        <b id="nav-name">User</b>
-                        <div style="color: var(--text-dim); font-size: 0.9rem;">@handle</div>
+                        <b id="nav-name" style="display: block;">User</b>
+                        <span id="nav-handle" style="color: var(--z-text-dim); font-size: 0.9rem;">@handle</span>
                     </div>
+                    <i class="fa-solid fa-ellipsis" style="margin-left: auto;"></i>
                 </div>
             </div>
         </nav>
@@ -178,18 +230,18 @@
         <main id="main-scroll">
             
             <section id="view-home">
-                <div class="header" onclick="window.scrollTo(0,0)">Home</div>
+                <div class="header-sticky" onclick="App.router.scrollToTop()">Home</div>
                 <div class="composer">
-                    <img id="comp-ava" class="avatar">
-                    <div class="composer-area">
-                        <textarea id="post-text" class="composer-input" placeholder="What is happening?!"></textarea>
-                        <div class="composer-tools">
-                            <div class="tool-icons">
-                                <i class="fa-regular fa-image"></i>
-                                <i class="fa-solid fa-square-poll-horizontal"></i>
-                                <i class="fa-regular fa-face-smile"></i>
+                    <img id="comp-avatar" class="avatar-sm">
+                    <div class="comp-area">
+                        <textarea id="pulse-input" class="comp-input" placeholder="What is happening?!"></textarea>
+                        <div class="comp-tools">
+                            <div>
+                                <i class="fa-regular fa-image tool-icon"></i>
+                                <i class="fa-solid fa-list-ul tool-icon"></i>
+                                <i class="fa-regular fa-face-smile tool-icon"></i>
                             </div>
-                            <button class="btn-primary" style="width: auto; padding: 8px 20px;" onclick="Zero.feed.post()">Post</button>
+                            <button class="btn-big" style="width: auto; padding: 10px 24px; font-size: 1rem; margin: 0;" onclick="App.data.createPulse()">Pulse</button>
                         </div>
                     </div>
                 </div>
@@ -197,271 +249,385 @@
             </section>
 
             <section id="view-profile" class="hidden">
-                <div class="header" id="prof-header-name">Profile</div>
-                <div class="profile-banner" id="prof-banner"></div>
+                <div class="header-sticky" id="profile-header-name">Profile</div>
+                <div class="banner" id="profile-banner"></div>
                 <div class="profile-data">
-                    <img id="prof-ava" class="profile-avatar-lg">
-                    <button class="profile-btn">Edit Profile</button>
-                    <div style="margin-top: 70px;">
-                        <h2 id="prof-name" style="font-weight: 800; font-size: 1.5rem;">Name</h2>
-                        <div id="prof-handle" style="color: var(--text-dim); margin-bottom: 15px;">@handle</div>
-                        <div id="prof-bio">Bio goes here</div>
-                        <div style="display: flex; gap: 15px; margin-top: 15px; color: var(--text-dim); font-size: 0.95rem;">
-                            <span><b style="color: var(--text)">109</b> Following</span>
-                            <span><b style="color: var(--text)">4,231</b> Followers</span>
+                    <img id="profile-avatar" class="profile-pic-lg">
+                    <button class="btn-edit" id="btn-profile-action" onclick="App.data.toggleFollow()">Edit Profile</button>
+                    <div style="margin-top: 75px;">
+                        <h1 id="profile-name" style="font-weight: 800; font-size: 1.5rem;">User Name</h1>
+                        <div id="profile-handle" style="color: var(--z-text-dim);">@handle</div>
+                        <div id="profile-bio" style="margin-top: 12px; line-height: 1.4;">Zero User Bio</div>
+                        <div style="margin-top: 15px; display: flex; gap: 20px; color: var(--z-text-dim); font-size: 0.95rem;">
+                            <span><b style="color: white;" id="count-following">0</b> Following</span>
+                            <span><b style="color: white;" id="count-followers">0</b> Followers</span>
                         </div>
                     </div>
                 </div>
-                <div class="profile-tabs">
-                    <div class="tab active">Posts</div>
-                    <div class="tab">Replies</div>
-                    <div class="tab">Likes</div>
+                <div style="display: flex; border-bottom: 1px solid var(--z-border);">
+                    <div style="flex: 1; text-align: center; padding: 15px; font-weight: 700; border-bottom: 4px solid var(--z-brand-blue);">Pulses</div>
+                    <div style="flex: 1; text-align: center; padding: 15px; color: var(--z-text-dim);">Replies</div>
+                    <div style="flex: 1; text-align: center; padding: 15px; color: var(--z-text-dim);">Likes</div>
                 </div>
-                <div id="prof-feed-container"></div>
+                <div id="profile-feed"></div>
             </section>
 
             <section id="view-explore" class="hidden">
-                <div class="header">
-                    <input type="text" placeholder="Search Zero" style="width: 100%; background: #202327; padding: 10px 20px; border-radius: 20px;" oninput="Zero.search.run(this.value)">
+                <div class="header-sticky">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" placeholder="Search Zero" oninput="App.utils.debounce(App.data.searchUsers, 500)(this.value)">
+                    </div>
                 </div>
                 <div id="search-results"></div>
             </section>
+
         </main>
 
-        <aside style="padding: 20px 30px;">
-            <div style="background: #16181c; border-radius: 16px; padding: 15px;">
-                <h3 style="font-weight: 800; font-size: 1.2rem; margin-bottom: 15px;">What's happening</h3>
+        <aside>
+            <div class="search-box" style="margin-bottom: 20px;">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Search">
+            </div>
+            <div class="trend-card">
+                <h3 style="font-weight: 800; font-size: 1.2rem; margin-bottom: 15px;">Trends for you</h3>
                 <div style="margin-bottom: 20px;">
-                    <div style="color: var(--text-dim); font-size: 0.8rem;">Technology · Trending</div>
-                    <div style="font-weight: 700; margin: 2px 0;">#ZeroLaunch</div>
-                    <div style="color: var(--text-dim); font-size: 0.8rem;">54.2K Posts</div>
+                    <small style="color: var(--z-text-dim);">Technology · Trending</small>
+                    <div style="font-weight: 700; margin: 2px 0;">#ZeroCore</div>
+                    <small style="color: var(--z-text-dim);">125K Pulses</small>
                 </div>
                 <div style="margin-bottom: 20px;">
-                    <div style="color: var(--text-dim); font-size: 0.8rem;">Politics · Trending</div>
-                    <div style="font-weight: 700; margin: 2px 0;">#IndiaDigital</div>
-                    <div style="color: var(--text-dim); font-size: 0.8rem;">12.5K Posts</div>
+                    <small style="color: var(--z-text-dim);">Politics · Trending</small>
+                    <div style="font-weight: 700; margin: 2px 0;">#GlobalNews</div>
+                    <small style="color: var(--z-text-dim);">88K Pulses</small>
                 </div>
             </div>
         </aside>
     </div>
 
     <script>
+        // --- 0. CONFIGURATION & LIBS ---
         dayjs.extend(window.dayjs_plugin_relativeTime);
+        const SUPABASE_URL = 'https://tsuiaealzqkkwmlwrdyn.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_5WCnkOmfRZ4W3sTNDwtlpQ_pmIZi90g'; // Note: In real app, use env vars
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        const CONFIG = {
-            url: 'https://tsuiaealzqkkwmlwrdyn.supabase.co',
-            key: 'sb_publishable_5WCnkOmfRZ4W3sTNDwtlpQ_pmIZi90g'
+        // --- 1. STATE MANAGEMENT (Mini-Redux) ---
+        const State = {
+            user: null,         // Current Auth User
+            profile: null,      // Current User Profile Data
+            viewingProfile: null, // Profile currently being viewed
+            cache: {            // Simple caching to reduce API calls
+                profiles: {},
+                pulses: []
+            }
         };
-        const sb = supabase.createClient(CONFIG.url, CONFIG.key);
 
-        const Zero = {
-            state: { user: null, profile: null },
-
-            // --- 1. BOOTSTRAP ---
-            async init() {
-                sb.auth.onAuthStateChange(async (event, session) => {
+        // --- 2. APP CONTROLLER ---
+        const App = {
+            
+            // --- A. INITIALIZATION ---
+            init: async () => {
+                // Listen for Auth Changes
+                sb.auth.onAuthStateChange((event, session) => {
                     if (session) {
-                        this.state.user = session.user;
-                        await this.fetchProfile();
+                        State.user = session.user;
+                        App.data.fetchMyProfile();
                     } else {
-                        this.ui.showAuth();
+                        App.ui.showAuth();
                     }
                 });
             },
 
-            async fetchProfile() {
-                // Retry loop for trigger latency
-                let retries = 5;
-                while (retries > 0) {
-                    const { data } = await sb.from('profiles').select('*').eq('id', this.state.user.id).maybeSingle();
-                    if (data) {
-                        this.state.profile = data;
-                        this.ui.launch();
-                        return;
-                    }
-                    await new Promise(r => setTimeout(r, 1000));
-                    retries--;
-                }
-            },
-
-            // --- 2. AUTHENTICATION ---
+            // --- B. AUTHENTICATION SERVICE ---
             auth: {
-                async login() {
-                    const email = document.getElementById('login-email').value;
-                    const pass = document.getElementById('login-pass').value;
+                login: async () => {
+                    const email = document.getElementById('in-login-email').value;
+                    const pass = document.getElementById('in-login-pass').value;
+                    if (!email || !pass) return App.ui.toast("Please fill in all fields", "error");
+                    
                     const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-                    if (error) alert(error.message);
+                    if (error) App.ui.toast(error.message, "error");
+                    else App.ui.toast("Welcome back", "success");
                 },
-                async signup() {
-                    const name = document.getElementById('reg-name').value;
-                    const email = document.getElementById('reg-email').value;
-                    const pass = document.getElementById('reg-pass').value;
+
+                signup: async () => {
+                    const name = document.getElementById('in-reg-name').value;
+                    const email = document.getElementById('in-reg-email').value;
+                    const pass = document.getElementById('in-reg-pass').value;
+                    if (!name || !email || !pass) return App.ui.toast("All fields required", "error");
+
                     const { error } = await sb.auth.signUp({
                         email, password: pass,
                         options: { data: { full_name: name } }
                     });
-                    if (error) alert(error.message);
-                    else alert("Account created! Logging you in...");
+                    if (error) App.ui.toast(error.message, "error");
+                    else App.ui.toast("Account created! Logging in...", "success");
                 },
-                async logout() {
+
+                logout: async () => {
                     await sb.auth.signOut();
-                    location.reload();
+                    window.location.reload();
                 }
             },
 
-            // --- 3. FEED & INTERACTIONS ---
-            feed: {
-                async load(target = 'feed-container', userId = null) {
-                    let query = sb.from('posts').select('*, profiles!user_id(*), likes(user_id), reposts(user_id)').order('created_at', { ascending: false });
+            // --- C. DATA & API LAYER ---
+            data: {
+                // Fetch current user profile with retry logic
+                fetchMyProfile: async () => {
+                    let retries = 5;
+                    while (retries > 0) {
+                        const { data } = await sb.from('profiles').select('*').eq('id', State.user.id).maybeSingle();
+                        if (data) {
+                            State.profile = data;
+                            App.ui.launchApp();
+                            return;
+                        }
+                        await new Promise(r => setTimeout(r, 800)); // Wait for trigger
+                        retries--;
+                    }
+                    App.ui.toast("Error loading profile. Please refresh.", "error");
+                },
+
+                fetchFeed: async (targetId = 'feed-container', userId = null) => {
+                    // Show Skeletons
+                    document.getElementById(targetId).innerHTML = App.ui.templates.skeleton() + App.ui.templates.skeleton();
+
+                    let query = sb.from('pulses')
+                        .select('*, profiles!user_id(*), likes(user_id), reposts(user_id)')
+                        .order('created_at', { ascending: false })
+                        .limit(50);
                     
                     if (userId) query = query.eq('user_id', userId);
-                    
-                    const { data: posts } = await query;
-                    
-                    const container = document.getElementById(target);
-                    container.innerHTML = posts.map(p => this.renderPost(p)).join('');
+
+                    const { data, error } = await query;
+                    if (error) return console.error(error);
+
+                    App.ui.renderPulses(data, targetId);
                 },
 
-                renderPost(p) {
-                    const isLiked = p.likes.some(l => l.user_id === Zero.state.user.id);
-                    const isReposted = p.reposts.some(r => r.user_id === Zero.state.user.id);
-                    const author = p.profiles || { username: 'Zero User', handle: 'user', avatar_url: '' };
-                    
-                    return `
-                    <div class="post" onclick="Zero.router.go('profile', null, '${author.id}')">
-                        <img src="${author.avatar_url}" class="avatar">
-                        <div style="flex: 1">
-                            <div class="post-header">
-                                <b>${author.username}</b>
-                                <span>@${author.handle}</span>
-                                <span>· ${dayjs(p.created_at).fromNow(true)}</span>
-                            </div>
-                            <div class="post-content">${p.content}</div>
-                            <div class="post-actions">
-                                <div class="action"><i class="fa-regular fa-comment"></i> ${p.reply_count || 0}</div>
-                                <div class="action ${isReposted ? 'reposted' : ''} repost" onclick="event.stopPropagation(); Zero.actions.toggleRepost(${p.id}, this)">
-                                    <i class="fa-solid fa-retweet"></i> <span class="count">${p.reposts_count}</span>
-                                </div>
-                                <div class="action ${isLiked ? 'liked' : ''} like" onclick="event.stopPropagation(); Zero.actions.toggleLike(${p.id}, this)">
-                                    <i class="${isLiked ? 'fa-solid' : 'fa-regular'} fa-heart"></i> <span class="count">${p.likes_count}</span>
-                                </div>
-                                <div class="action"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
-                            </div>
-                        </div>
-                    </div>`;
-                },
+                createPulse: async () => {
+                    const input = document.getElementById('pulse-input');
+                    const text = input.value.trim();
+                    if (!text) return;
 
-                async post() {
-                    const text = document.getElementById('post-text').value;
-                    if(!text) return;
-                    await sb.from('posts').insert([{ user_id: Zero.state.user.id, content: text }]);
-                    document.getElementById('post-text').value = '';
-                    this.load();
-                }
-            },
-
-            // --- 4. ACTIONS (OPTIMISTIC UI) ---
-            actions: {
-                async toggleLike(pid, el) {
-                    const isLiked = el.classList.contains('liked');
-                    const countEl = el.querySelector('.count');
-                    let count = parseInt(countEl.innerText);
-
-                    // Immediate UI Update
-                    el.classList.toggle('liked');
-                    el.querySelector('i').className = isLiked ? 'fa-regular fa-heart' : 'fa-solid fa-heart';
-                    countEl.innerText = isLiked ? count - 1 : count + 1;
-
-                    // Background DB Update
-                    if (isLiked) await sb.from('likes').delete().eq('post_id', pid).eq('user_id', Zero.state.user.id);
-                    else await sb.from('likes').insert([{ post_id: pid, user_id: Zero.state.user.id }]);
-                },
-
-                async toggleRepost(pid, el) {
-                    const isRep = el.classList.contains('reposted');
-                    const countEl = el.querySelector('.count');
-                    let count = parseInt(countEl.innerText);
-                    
-                    el.classList.toggle('reposted');
-                    countEl.innerText = isRep ? count - 1 : count + 1;
-
-                    if (isRep) {
-                         await sb.from('reposts').delete().eq('post_id', pid).eq('user_id', Zero.state.user.id);
-                         // Decrement counter via RPC or trigger (handled by trigger in SQL)
+                    const { error } = await sb.from('pulses').insert([{ user_id: State.user.id, content: text }]);
+                    if (error) {
+                        App.ui.toast("Failed to post", "error");
                     } else {
-                        await sb.from('reposts').insert([{ post_id: pid, user_id: Zero.state.user.id }]);
+                        input.value = '';
+                        App.ui.toast("Pulse sent", "success");
+                        App.data.fetchFeed(); // Refresh
                     }
-                }
-            },
-
-            // --- 5. NAVIGATION & UI ---
-            router: {
-                go(view, el, userId = null) {
-                    if (el) {
-                        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                        el.classList.add('active');
-                    }
-                    document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
-                    document.getElementById(`view-${view}`).classList.remove('hidden');
-
-                    if (view === 'home') Zero.feed.load();
-                    if (view === 'profile') this.loadProfile(userId || Zero.state.user.id);
                 },
 
-                async loadProfile(uid) {
-                    const { data: p } = await sb.from('profiles').select('*').eq('id', uid).single();
-                    if(!p) return;
+                toggleLike: async (pulseId, btnElement) => {
+                    const isLiked = btnElement.classList.contains('liked');
+                    const countSpan = btnElement.querySelector('.count');
+                    let count = parseInt(countSpan.innerText);
+
+                    // Optimistic UI Update
+                    btnElement.classList.toggle('liked');
+                    countSpan.innerText = isLiked ? count - 1 : count + 1;
+                    btnElement.querySelector('i').className = isLiked ? 'fa-regular fa-heart' : 'fa-solid fa-heart';
+
+                    // API Call
+                    if (isLiked) await sb.from('likes').delete().eq('pulse_id', pulseId).eq('user_id', State.user.id);
+                    else await sb.from('likes').insert([{ pulse_id: pulseId, user_id: State.user.id }]);
+                },
+
+                toggleFollow: async () => {
+                    const targetId = State.viewingProfile.id;
+                    const btn = document.getElementById('btn-profile-action');
                     
-                    document.getElementById('prof-banner').style.backgroundImage = `url(${p.banner_url})`;
-                    document.getElementById('prof-ava').src = p.avatar_url;
-                    document.getElementById('prof-name').innerText = p.username;
-                    document.getElementById('prof-header-name').innerText = p.username;
-                    document.getElementById('prof-handle').innerText = '@' + p.handle;
-                    document.getElementById('prof-bio').innerText = p.bio;
+                    if (targetId === State.user.id) return alert("Edit Profile Modal Placeholder");
+
+                    const isFollowing = btn.innerText === 'Following';
                     
-                    Zero.feed.load('prof-feed-container', uid);
-                }
-            },
+                    // Optimistic UI
+                    btn.innerText = isFollowing ? 'Follow' : 'Following';
+                    btn.style.background = isFollowing ? 'transparent' : 'white';
+                    btn.style.color = isFollowing ? 'white' : 'black';
 
-            ui: {
-                launch() {
-                    document.getElementById('auth-gate').classList.add('hidden');
-                    document.getElementById('app').classList.remove('hidden');
-                    const p = Zero.state.profile;
-                    document.getElementById('nav-ava').src = p.avatar_url;
-                    document.getElementById('comp-ava').src = p.avatar_url;
-                    document.getElementById('nav-name').innerText = p.username;
-                    Zero.feed.load();
+                    if (isFollowing) await sb.from('follows').delete().eq('follower_id', State.user.id).eq('following_id', targetId);
+                    else await sb.from('follows').insert([{ follower_id: State.user.id, following_id: targetId }]);
                 },
-                showAuth() {
-                    document.getElementById('auth-gate').classList.remove('hidden');
-                    document.getElementById('app').classList.add('hidden');
-                },
-                toggleAuth(mode) {
-                    document.getElementById('form-login').classList.toggle('hidden', mode !== 'login');
-                    document.getElementById('form-signup').classList.toggle('hidden', mode !== 'signup');
-                },
-                focusComposer() {
-                    Zero.router.go('home');
-                    document.getElementById('post-text').focus();
-                }
-            },
 
-            search: {
-                async run(query) {
-                    if(query.length < 2) return;
-                    const { data } = await sb.from('profiles').select('*').ilike('username', `%${query}%`).limit(5);
-                    document.getElementById('search-results').innerHTML = data.map(u => `
-                        <div class="post" onclick="Zero.router.go('profile', null, '${u.id}')">
-                            <img src="${u.avatar_url}" class="avatar">
-                            <div><b>${u.username}</b><br><span style="color:#71767b">@${u.handle}</span></div>
+                searchUsers: async (query) => {
+                    if (query.length < 2) return;
+                    const { data } = await sb.from('profiles').select('*').ilike('username', `%${query}%`).limit(10);
+                    
+                    const container = document.getElementById('search-results');
+                    container.innerHTML = data.map(u => `
+                        <div class="pulse-item" onclick="App.router.go('profile', '${u.id}')">
+                            <img src="${u.avatar_url}" class="avatar-sm">
+                            <div>
+                                <b>${u.username}</b><br>
+                                <span style="color:var(--z-text-dim)">@${u.handle}</span>
+                            </div>
                         </div>
                     `).join('');
+                }
+            },
+
+            // --- D. UI CONTROLLER ---
+            ui: {
+                showAuth: () => {
+                    document.getElementById('module-auth').classList.remove('hidden');
+                    document.getElementById('module-app').classList.add('hidden');
+                },
+                launchApp: () => {
+                    document.getElementById('module-auth').classList.add('hidden');
+                    document.getElementById('module-app').classList.remove('hidden');
+                    
+                    // Hydrate Nav
+                    document.getElementById('nav-avatar').src = State.profile.avatar_url;
+                    document.getElementById('comp-avatar').src = State.profile.avatar_url;
+                    document.getElementById('nav-name').innerText = State.profile.username;
+                    document.getElementById('nav-handle').innerText = '@' + State.profile.handle;
+                    
+                    // Initial Load
+                    App.data.fetchFeed();
+                },
+                toggleAuth: (view) => {
+                    document.getElementById('view-login').classList.toggle('hidden', view !== 'login');
+                    document.getElementById('view-signup').classList.toggle('hidden', view !== 'signup');
+                },
+                toast: (msg, type = 'success') => {
+                    const t = document.createElement('div');
+                    t.className = 'toast';
+                    t.innerText = msg;
+                    t.style.background = type === 'error' ? '#f91880' : '#1d9bf0';
+                    document.getElementById('toast-container').appendChild(t);
+                    setTimeout(() => t.remove(), 3000);
+                },
+                focusComposer: () => {
+                    App.router.go('home');
+                    document.getElementById('pulse-input').focus();
+                },
+
+                // Template Engine
+                templates: {
+                    skeleton: () => `
+                        <div class="pulse-item">
+                            <div class="skeleton" style="width:45px; height:45px; border-radius:50%"></div>
+                            <div style="flex:1">
+                                <div class="skeleton" style="width:30%; height:15px; margin-bottom:10px"></div>
+                                <div class="skeleton" style="width:90%; height:15px; margin-bottom:5px"></div>
+                                <div class="skeleton" style="width:60%; height:15px"></div>
+                            </div>
+                        </div>`,
+                    
+                    pulse: (p) => {
+                        const isLiked = p.likes.some(l => l.user_id === State.user.id);
+                        const isReposted = p.reposts.some(r => r.user_id === State.user.id);
+                        return `
+                        <div class="pulse-item" onclick="App.router.go('profile', '${p.user_id}')">
+                            <img src="${p.profiles.avatar_url}" class="avatar-sm" loading="lazy">
+                            <div style="flex:1">
+                                <div class="pulse-meta">
+                                    <b>${p.profiles.username}</b>
+                                    <span>@${p.profiles.handle} · ${dayjs(p.created_at).fromNow(true)}</span>
+                                </div>
+                                <div class="pulse-text">${p.content}</div>
+                                <div class="pulse-stats">
+                                    <button class="stat-btn"><i class="fa-regular fa-comment"></i> ${p.replies_count}</button>
+                                    <button class="stat-btn repost ${isReposted?'reposted':''}" onclick="event.stopPropagation(); App.data.toggleRepost(${p.id}, this)">
+                                        <i class="fa-solid fa-retweet"></i> <span class="count">${p.reposts_count}</span>
+                                    </button>
+                                    <button class="stat-btn like ${isLiked?'liked':''}" onclick="event.stopPropagation(); App.data.toggleLike(${p.id}, this)">
+                                        <i class="${isLiked?'fa-solid':'fa-regular'} fa-heart"></i> <span class="count">${p.likes_count}</span>
+                                    </button>
+                                    <button class="stat-btn"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                },
+
+                renderPulses: (list, target) => {
+                    document.getElementById(target).innerHTML = list.map(p => App.ui.templates.pulse(p)).join('');
+                }
+            },
+
+            // --- E. ROUTER SYSTEM ---
+            router: {
+                go: async (route, param = null) => {
+                    // Update Nav
+                    document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+                    // Hide all Views
+                    document.querySelectorAll('section').forEach(el => el.classList.add('hidden'));
+                    
+                    if (route === 'home') {
+                        document.getElementById('view-home').classList.remove('hidden');
+                        App.data.fetchFeed();
+                    } 
+                    else if (route === 'profile') {
+                        document.getElementById('view-profile').classList.remove('hidden');
+                        const uid = param || State.user.id;
+                        await App.router.loadProfileView(uid);
+                    }
+                    else if (route === 'explore') {
+                        document.getElementById('view-explore').classList.remove('hidden');
+                    }
+                },
+
+                loadProfileView: async (uid) => {
+                    // Fetch fresh profile
+                    const { data: p } = await sb.from('profiles').select('*').eq('id', uid).single();
+                    if (!p) return;
+                    State.viewingProfile = p;
+
+                    document.getElementById('profile-banner').style.backgroundImage = `url(${p.banner_url})`;
+                    document.getElementById('profile-avatar').src = p.avatar_url;
+                    document.getElementById('profile-name').innerText = p.username;
+                    document.getElementById('profile-handle').innerText = '@' + p.handle;
+                    document.getElementById('count-followers').innerText = p.followers_count;
+                    document.getElementById('count-following').innerText = p.following_count;
+
+                    // Handle Edit/Follow Button
+                    const btn = document.getElementById('btn-profile-action');
+                    if (uid === State.user.id) {
+                        btn.innerText = 'Edit Profile';
+                        btn.style.background = 'transparent'; btn.style.color = 'white';
+                    } else {
+                        const { data: follow } = await sb.from('follows').select('*').eq('follower_id', State.user.id).eq('following_id', uid).maybeSingle();
+                        if (follow) {
+                            btn.innerText = 'Following';
+                            btn.style.background = 'white'; btn.style.color = 'black';
+                        } else {
+                            btn.innerText = 'Follow';
+                            btn.style.background = 'transparent'; btn.style.color = 'white';
+                        }
+                    }
+
+                    App.data.fetchFeed('profile-feed', uid);
+                },
+
+                scrollToTop: () => {
+                    document.getElementById('main-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            },
+
+            // --- F. UTILITIES ---
+            utils: {
+                debounce: (func, wait) => {
+                    let timeout;
+                    return function executedFunction(...args) {
+                        const later = () => {
+                            clearTimeout(timeout);
+                            func(...args);
+                        };
+                        clearTimeout(timeout);
+                        timeout = setTimeout(later, wait);
+                    };
                 }
             }
         };
 
-        Zero.init();
+        // --- 3. BOOT ---
+        window.onload = App.init;
+
     </script>
 </body>
 </html>
